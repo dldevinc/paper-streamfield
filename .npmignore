@@ -1,0 +1,7 @@
+.github/
+.idea/
+.prettierrc
+.prettierignore
+src/
+babel.config.json
+webpack.config.js
