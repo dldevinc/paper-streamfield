@@ -1,4 +1,5 @@
 import os
+from django.utils.translation import gettext_lazy as _
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -20,6 +21,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    "paper_admin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -72,6 +74,8 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -96,3 +100,26 @@ STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "static"))
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, "media"))
 FILE_UPLOAD_PERMISSIONS = 0o666
+
+# =============
+#  Paper Admin
+# =============
+PAPER_FAVICON = "app/favicon.png"
+
+PAPER_ENVIRONMENT_NAME = "development"
+PAPER_ENVIRONMENT_COLOR = "#FFFF00"
+
+PAPER_MENU = [
+    dict(
+        label=_("Dashboard"),
+        url="admin:index",
+        icon="fa fa-fw fa-lg fa-area-chart",
+    ),
+    dict(
+        app="app",
+        icon="fa fa-fw fa-lg fa-home",
+    ),
+    "-",
+    "auth",
+]
+

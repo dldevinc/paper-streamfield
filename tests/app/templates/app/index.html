@@ -1,1 +1,9 @@
 <h1>Index page</h1>
+
+<ol>
+  {% for page in pages %}
+    <li>
+      <a href="{{ page.get_absolute_url }}">{{ page.header }}</a>
+    </li>
+  {% endfor %}
+</ol>
