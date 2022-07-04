@@ -17,7 +17,7 @@ Implementation of the Wagtail's StreamField block picker for paper-admin.
 Install the latest release with pip:
 
 ```shell
-pip install paper-streamfield
+pip install paper-streamfield[orjson]
 ```
 
 Add `streamfield` to your INSTALLED_APPS in django's `settings.py`:

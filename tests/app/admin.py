@@ -9,6 +9,9 @@ class PageAdmin(admin.ModelAdmin):
         (None, {
             "fields": ["header", "slug", "text"]
         }),
+        (None, {
+            "fields": ["stream"]
+        }),
     )
     ordering = ["id"]
     prepopulated_fields = {
