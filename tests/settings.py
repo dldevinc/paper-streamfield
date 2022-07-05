@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "streamfield",
     "app",
+    "blocks",
 ]
 
 MIDDLEWARE = [

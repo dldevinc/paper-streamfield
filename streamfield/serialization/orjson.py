@@ -1,8 +1,4 @@
-import orjson as json  # noqa
-
-__all__ = [
-    "dumps", "loads"
-]
+import orjson as json
 
 
 def dumps(value) -> str:

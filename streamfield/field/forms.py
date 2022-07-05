@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.forms.fields import InvalidJSONInput
 from django.utils.translation import gettext_lazy as _
 
-from .serialization import dumps, loads
+from ..serialization import dumps, loads
 from .widgets import StreamWidget
 
 

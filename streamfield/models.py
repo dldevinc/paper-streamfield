@@ -5,5 +5,6 @@ class StreamBlockModelMixin:
     pass
 
 
-class StreamBlockModel(models.Model):
-    pass
+class StreamBlockModel(StreamBlockModelMixin, models.Model):
+    class Meta:
+        abstract = True
