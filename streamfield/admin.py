@@ -1,12 +1,9 @@
 from django.contrib import admin
-
-from .helpers import get_streamblocks_models
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 class StreamBlockModelAdmin(admin.ModelAdmin):
-    pass
+    streamfield_icon = "streamfield/unknown.svg"
 
-
-for model in get_streamblocks_models():
-    if not admin.site.is_registered(model):
-        admin.site.register(model, StreamBlockModelAdmin)
+    def get_streamfield_icon(self):
+        return staticfiles_storage.url(self.streamfield_icon)
