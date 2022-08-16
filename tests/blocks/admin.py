@@ -7,14 +7,14 @@ from .models import HeaderBlock, ImageBlock, TextBlock
 
 @admin.register(HeaderBlock)
 class HeaderBlockAdmin(StreamBlockModelAdmin):
-    streamfield_icon = "streamfield/header.svg"
+    streamfield_icon = "blocks/icons/header.svg"
 
 
 @admin.register(ImageBlock)
 class ImageBlockAdmin(StreamBlockModelAdmin):
-    streamfield_icon = "streamfield/image.svg"
+    streamfield_icon = "blocks/icons/image.svg"
 
 
 @admin.register(TextBlock)
 class TextBlockAdmin(StreamBlockModelAdmin):
-    streamfield_icon = "streamfield/text.svg"
+    streamfield_icon = "blocks/icons/text.svg"
