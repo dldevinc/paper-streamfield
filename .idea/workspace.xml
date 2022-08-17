@@ -3,12 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="a84b0ebe-985c-4b44-b07f-f30b6a253296" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/static/streamfield/header.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/static/streamfield/image.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/static/streamfield/text.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/static/streamfield/unknown.svg" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/static/streamfield/default.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/blocks/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/blocks/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/streamfield/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/tests/test_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/tests/test_helpers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,17 +49,17 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests/blocks/static/blocks/icons" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests/tests" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="configurable.group.language" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests/tests" />
       <recent name="$PROJECT_DIR$/tests/blocks/static/blocks/icons" />
       <recent name="$PROJECT_DIR$/streamfield/static/streamfield" />
       <recent name="$PROJECT_DIR$/tests/blocks" />
-      <recent name="$PROJECT_DIR$/tests/tests" />
       <recent name="$PROJECT_DIR$/streamfield" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -87,7 +83,7 @@
       <workItem from="1657267193592" duration="2677000" />
       <workItem from="1660653768779" duration="938000" />
       <workItem from="1660656339988" duration="147000" />
-      <workItem from="1660656770720" duration="3252000" />
+      <workItem from="1660656770720" duration="26348000" />
     </task>
     <servers />
   </component>

@@ -3,21 +3,25 @@ from django.db import models
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
-from streamfield.models import StreamBlockModel
+from streamfield.decorators import streamblock
 
 
-class HeaderBlock(StreamBlockModel):
+@streamblock(icon="blocks/icons/header.svg")
+class HeaderBlock(models.Model):
     header = models.CharField(
         _("header"),
         max_length=255
     )
-    level = models.PositiveSmallIntegerField(
-        _("level"),
+    rank = models.PositiveSmallIntegerField(
+        _("rank"),
         default=1,
         validators=[
             MinValueValidator(1),
             MaxValueValidator(6)
-        ]
+        ],
+        help_text="The most important heading has the rank 1 (&lt;h1&gt;), the least important heading rank 6 (&lt;h6&gt;). "
+                  "Headings with an equal or higher rank start a new section, headings with a lower rank start new "
+                  "subsections that are part of the higher ranked section."
     )
 
     class Meta:
@@ -28,7 +32,8 @@ class HeaderBlock(StreamBlockModel):
         return self.header
 
 
-class TextBlock(StreamBlockModel):
+@streamblock(icon="blocks/icons/image.svg")
+class TextBlock(models.Model):
     text = models.TextField(
         _("text")
     )
@@ -41,7 +46,8 @@ class TextBlock(StreamBlockModel):
         return Truncator(self.text).chars(64)
 
 
-class ImageBlock(StreamBlockModel):
+@streamblock(icon="blocks/icons/text.svg")
+class ImageBlock(models.Model):
     image = models.ImageField(
         _("image")
     )

@@ -1,18 +1,28 @@
-from functools import lru_cache
-from typing import List, Type
+from typing import Any, Dict, Generator, Tuple, Type
 
 from django.apps import apps
+from django.db.models import Model
 
-from .models import StreamBlockModelMixin
+from .registry import registry
 
 
-@lru_cache
-def get_streamblocks_models() -> List[Type[StreamBlockModelMixin]]:
+def get_streamblock_models() -> Generator[Tuple[Type[Model], Dict], Any, None]:
     """
-    Возвращает список моделей всех блоков.
+    Возвращает модели всех блоков с их параметрами.
     """
-    return [
-        model
-        for model in apps.get_models()
-        if issubclass(model, StreamBlockModelMixin) and not model._meta.abstract
-    ]
+    for app_name, model_name in registry:
+        model = apps.get_model(app_name, model_name)
+        options = registry[(app_name, model_name)]
+        yield model, options
+
+
+def get_streamblock_dict(instance: Model):
+    """
+    Возвращает JSON-сериализуемый словарь,
+    которым блок будет представлен в БД.
+    """
+    return {
+        "app_label": instance._meta.app_label,
+        "model_name": instance._meta.model_name,
+        "pk": instance.pk
+    }

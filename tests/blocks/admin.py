@@ -1,20 +1,18 @@
 from django.contrib import admin
 
-from streamfield.admin import StreamBlockModelAdmin
-
 from .models import HeaderBlock, ImageBlock, TextBlock
 
 
 @admin.register(HeaderBlock)
-class HeaderBlockAdmin(StreamBlockModelAdmin):
-    streamfield_icon = "blocks/icons/header.svg"
+class HeaderBlockAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "rank"]
 
 
 @admin.register(ImageBlock)
-class ImageBlockAdmin(StreamBlockModelAdmin):
-    streamfield_icon = "blocks/icons/image.svg"
+class ImageBlockAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "title"]
 
 
 @admin.register(TextBlock)
-class TextBlockAdmin(StreamBlockModelAdmin):
-    streamfield_icon = "blocks/icons/text.svg"
+class TextBlockAdmin(admin.ModelAdmin):
+    pass

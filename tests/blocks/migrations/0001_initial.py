@@ -2,7 +2,6 @@
 
 import django.core.validators
 from django.db import migrations, models
-import streamfield.models
 
 
 class Migration(migrations.Migration):
@@ -24,7 +23,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Header',
                 'verbose_name_plural': 'Headers',
             },
-            bases=(streamfield.models.StreamBlockModelMixin, models.Model),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='ImageBlock',
@@ -38,7 +37,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Image',
                 'verbose_name_plural': 'Images',
             },
-            bases=(streamfield.models.StreamBlockModelMixin, models.Model),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='TextBlock',
@@ -50,6 +49,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Text',
                 'verbose_name_plural': 'Text',
             },
-            bases=(streamfield.models.StreamBlockModelMixin, models.Model),
+            bases=(models.Model, ),
         ),
     ]
