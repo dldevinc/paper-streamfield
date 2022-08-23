@@ -1,25 +1,23 @@
+from typing import Type, Union
 from unittest.mock import Mock
 
-import pytest
+from django.db.models import Model
 
 from streamfield.registry import Registry
 
-ProductModel = Mock(_meta=Mock(app_label="shop", model_name="product"))
-ArticleModel = Mock(_meta=Mock(app_label="blog", model_name="article"))
+ProductModel = Mock(_meta=Mock(app_label="shop", model_name="product"))  # type: Union[Mock, Type[Model]]
+ArticleModel = Mock(_meta=Mock(app_label="blog", model_name="article"))  # type: Union[Mock, Type[Model]]
 
 
-def test_getitem():
+def test_len():
     registry = Registry()
-    registry.register(ProductModel)
-    assert registry[ProductModel] is registry[("shop", "product")] is registry["shop.product"]
-    assert type(registry[ProductModel]) is dict
+    assert len(registry) == 0
 
-
-def test_getitem_fail():
-    registry = Registry()
     registry.register(ProductModel)
-    with pytest.raises(LookupError):
-        registry[ArticleModel]  # noqa
+    assert len(registry) == 1
+
+    registry.register(ArticleModel)
+    assert len(registry) == 2
 
 
 def test_contains():
@@ -37,29 +35,24 @@ def test_contains_fail():
     assert "blog.article" not in registry
 
 
-def test_default_options():
+def test_unregister():
     registry = Registry()
+
     registry.register(ProductModel)
-    assert registry[ProductModel] == {}
+    assert len(registry) == 1
+    assert ProductModel in registry
 
-
-def test_custom_options():
-    registry = Registry()
-    registry.register(ProductModel, name="example", force=True)
-    assert ("shop", "product") in registry
-    assert registry[ProductModel] == {
-        "name": "example",
-        "force": True
-    }
+    registry.unregister(ProductModel)
+    assert len(registry) == 0
+    assert ProductModel not in registry
 
 
 def test_duplicate_register():
     registry = Registry()
-    registry.register(ProductModel, name="yellow", index=1)
-    registry.register(ProductModel, name="green", alias="apple")
+    assert len(registry) == 0
 
+    registry.register(ProductModel)
     assert len(registry) == 1
-    assert registry[ProductModel] == {
-        "name": "green",
-        "alias": "apple"
-    }
+
+    registry.register(ProductModel)
+    assert len(registry) == 1

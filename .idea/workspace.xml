@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="a84b0ebe-985c-4b44-b07f-f30b6a253296" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/tests/test_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/tests/test_helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/streamfield/conf.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/conf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/streamfield/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/renderer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/blocks/templates/blocks/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/tests/blocks/templates/blocks/header.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/tests/test_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/tests/test_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/tests/test_renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/tests/test_renderer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,21 +52,22 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_MARK_IGNORED_FILES_AS_EXCLUDED" value="true" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/tests/tests" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.language" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.django.DjangoModulesConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/tests/tests" />
+      <recent name="$PROJECT_DIR$/tests/blocks/templates/blocks" />
       <recent name="$PROJECT_DIR$/tests/blocks/static/blocks/icons" />
       <recent name="$PROJECT_DIR$/streamfield/static/streamfield" />
       <recent name="$PROJECT_DIR$/tests/blocks" />
-      <recent name="$PROJECT_DIR$/streamfield" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -83,7 +90,13 @@
       <workItem from="1657267193592" duration="2677000" />
       <workItem from="1660653768779" duration="938000" />
       <workItem from="1660656339988" duration="147000" />
-      <workItem from="1660656770720" duration="26348000" />
+      <workItem from="1660656770720" duration="26996000" />
+      <workItem from="1660826413527" duration="7128000" />
+      <workItem from="1661100922745" duration="7687000" />
+      <workItem from="1661145679292" duration="1584000" />
+      <workItem from="1661147832609" duration="1762000" />
+      <workItem from="1661153073595" duration="13378000" />
+      <workItem from="1661186853713" duration="3823000" />
     </task>
     <servers />
   </component>

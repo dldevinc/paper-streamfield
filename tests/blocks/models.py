@@ -3,13 +3,12 @@ from django.db import models
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
-from streamfield.decorators import streamblock
+from streamfield.models import StreamBlockModel
 
 
-@streamblock(icon="blocks/icons/header.svg")
-class HeaderBlock(models.Model):
-    header = models.CharField(
-        _("header"),
+class HeaderBlock(StreamBlockModel):
+    text = models.CharField(
+        _("text"),
         max_length=255
     )
     rank = models.PositiveSmallIntegerField(
@@ -28,12 +27,15 @@ class HeaderBlock(models.Model):
         verbose_name = "Header"
         verbose_name_plural = "Headers"
 
+    class StreamBlockMeta:
+        admin_icon = "blocks/icons/header.svg"
+        template = "blocks/header.html"
+
     def __str__(self):
-        return self.header
+        return self.text
 
 
-@streamblock(icon="blocks/icons/image.svg")
-class TextBlock(models.Model):
+class TextBlock(StreamBlockModel):
     text = models.TextField(
         _("text")
     )
@@ -42,12 +44,15 @@ class TextBlock(models.Model):
         verbose_name = "Text"
         verbose_name_plural = "Text"
 
+    class StreamBlockMeta:
+        admin_icon = "blocks/icons/text.svg"
+        template = "blocks/text.html"
+
     def __str__(self):
         return Truncator(self.text).chars(64)
 
 
-@streamblock(icon="blocks/icons/text.svg")
-class ImageBlock(models.Model):
+class ImageBlock(StreamBlockModel):
     image = models.ImageField(
         _("image")
     )
@@ -65,6 +70,10 @@ class ImageBlock(models.Model):
     class Meta:
         verbose_name = "Image"
         verbose_name_plural = "Images"
+
+    class StreamBlockMeta:
+        admin_icon = "blocks/icons/image.svg"
+        template = "blocks/image.html"
 
     def __str__(self):
         return self.title or "Image #{}".format(self.pk)
