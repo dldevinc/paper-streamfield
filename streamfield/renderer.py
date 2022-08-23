@@ -1,19 +1,25 @@
 from typing import Dict
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.wsgi import WSGIRequest
 from django.template.loader import get_template, select_template
 
 from .models import Options
 from .typing import BlockInstance, BlockModel
 
 
-class TemplateRenderer:
+class BaseRenderer:
     def __init__(self, model: BlockModel):
-        self.meta = getattr(model, "_stream_meta", None)
-        if self.meta is None:
-            self.meta = Options()
+        self.meta = getattr(model, "_stream_meta", Options())
 
-    def __call__(self, block: BlockInstance, extra_context: Dict = None):
+    def __call__(self, block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None):
+        raise NotImplementedError
+
+
+class TemplateRenderer(BaseRenderer):
+    context_object_name = "block"
+
+    def __call__(self, block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None):
         template_name = getattr(self.meta, "template", None)
         if template_name is None:
             raise ImproperlyConfigured(
@@ -26,9 +32,8 @@ class TemplateRenderer:
 
         context = getattr(self.meta, "context", None) or {}
         context.update(extra_context or {})
-        context.setdefault("block", block)
-        request = context.pop("request", None)
-        return template.render(context, request)
+        context.setdefault(self.context_object_name, block)
+        return template.render(context, request=request)
 
     def resolve_template(self, name, using=None):
         if isinstance(name, (list, tuple)):

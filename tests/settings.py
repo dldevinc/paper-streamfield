@@ -50,10 +50,25 @@ ROOT_URLCONF = "urls"
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "NAME": "jinja2",
+        "BACKEND": "django_jinja.backend.Jinja2",
         "DIRS": [
             str(BASE_DIR / "templates"),
         ],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "app_dirname": "jinja2",
+            "match_extension": None,
+            "extensions": [
+                "jinja2.ext.i18n",
+                "jinja2.ext.loopcontrols",
+                "django_jinja.builtins.extensions.DjangoFiltersExtension",
+            ]
+        }
+    },
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

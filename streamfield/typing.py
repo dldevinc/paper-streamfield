@@ -1,8 +1,7 @@
-from typing import Any, Callable, Dict, Type, Union
+from typing import Any, Callable, Dict
 
-from django.db.models import Model
+from .models import StreamBlockMetaClass, StreamBlockModel
 
-BlockModel = Type[Model]
-BlockInstance = Model
+BlockModel = StreamBlockMetaClass
+BlockInstance = StreamBlockModel
 RenderFuncCallable = Callable[[BlockInstance, Dict[str, Any]], str]
-RenderFunc = Union[str, RenderFuncCallable]

@@ -1,24 +1,25 @@
-from typing import Any, Dict, Generator, Tuple
+from typing import Any, Dict, Generator, Tuple, Type, cast, Sequence
 
 from django.apps import apps
+from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Model
-from django.utils.module_loading import import_string
 
-from .typing import BlockModel, RenderFuncCallable
+from . import conf, utils
+from .logging import logger
+from .renderer import BaseRenderer
+from .typing import BlockInstance, BlockModel
 
 
-def import_render_func(value: str) -> RenderFuncCallable:
+def get_block_models(registry) -> Generator[Tuple[BlockModel, Dict], Any, None]:
     """
-    Импортирует функцию отрисовки блока из строкового представления
-    (пример: "app.views.render_header").
+    Возвращает модели всех блоков с их параметрами.
     """
-    render_func = import_string(value)
-    if not callable(render_func):
-        raise ImportError("%s object is not callable" % value)
-    return render_func
+    for app_name, model_name in registry:
+        model = apps.get_model(app_name, model_name)
+        yield model
 
 
-def get_streamblock_dict(instance: Model):
+def get_block_dict(instance: Model) -> Dict:
     """
     Возвращает JSON-сериализуемый словарь,
     которым блок будет представлен в БД.
@@ -30,10 +31,38 @@ def get_streamblock_dict(instance: Model):
     }
 
 
-def get_streamblock_models(registry) -> Generator[Tuple[BlockModel, Dict], Any, None]:
+def get_stream_blocks(stream: Sequence) -> Generator[BlockInstance, Any, None]:
     """
-    Возвращает модели всех блоков с их параметрами.
+    Парсит JSON и возвращает экземпляры блоков.
     """
-    for app_name, model_name in registry:
-        model = apps.get_model(app_name, model_name)
-        yield model
+    for record in stream:
+        try:
+            model = apps.get_model(
+                record["app_label"],
+                record["model_name"]
+            )
+        except LookupError as exc:
+            logger.warning(exc)
+            continue
+
+        instance = model._base_manager.filter(pk=record["pk"]).first()
+        if instance is None:
+            logger.warning(
+                "Object '%(app_label)s.%(model_name)s' with primary key '%(pk)s' does not exist."
+                % record
+            )
+            continue
+
+        yield instance
+
+
+def render_block(block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None) -> str:
+    renderer = getattr(block._stream_meta, "renderer", conf.DEFAULT_RENDERER)
+    if isinstance(renderer, str):
+        renderer = utils.import_render_func(renderer)
+
+    if isinstance(renderer, type):
+        renderer = cast(Type[BaseRenderer], renderer)
+        renderer = renderer(type(block))
+
+    return renderer(block, extra_context, request=request)
