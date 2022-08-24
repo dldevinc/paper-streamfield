@@ -1,10 +1,12 @@
-from typing import Any, Dict, Generator, Tuple, Type, cast, Sequence
+from typing import Any, Dict, Generator, Sequence, Tuple, Type, cast
 
 from django.apps import apps
 from django.core.handlers.wsgi import WSGIRequest
+from django.db import transaction, models
 from django.db.models import Model
 
 from . import conf, utils
+from .field.models import StreamField
 from .logging import logger
 from .renderer import BaseRenderer
 from .typing import BlockInstance, BlockModel
@@ -27,7 +29,7 @@ def get_block_dict(instance: Model) -> Dict:
     return {
         "app_label": instance._meta.app_label,
         "model_name": instance._meta.model_name,
-        "pk": instance.pk
+        "pk": str(instance.pk)
     }
 
 

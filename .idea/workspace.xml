@@ -6,14 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a84b0ebe-985c-4b44-b07f-f30b6a253296" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/streamfield/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/renderer.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/renderer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/typing.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/typing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/app/templates/app/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/tests/app/templates/app/detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/tests/conftest.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/tests/test_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/tests/test_helpers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +55,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/tests/blocks/jinja2" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.django.DjangoModulesConfigurable" />
+    <property name="settings.editor.selected.configurable" value="editing.templates" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -100,6 +93,7 @@
       <workItem from="1661147832609" duration="1762000" />
       <workItem from="1661153073595" duration="13378000" />
       <workItem from="1661186853713" duration="3823000" />
+      <workItem from="1661320124118" duration="12184000" />
     </task>
     <servers />
   </component>

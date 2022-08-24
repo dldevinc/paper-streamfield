@@ -27,7 +27,7 @@ def test_get_block_dict():
     assert data == {
         "app_label": "blocks",
         "model_name": "headerblock",
-        "pk": 1
+        "pk": "1"
     }
 
 
@@ -46,17 +46,17 @@ def test_get_stream_blocks():
         {
             "app_label": "blocks",
             "model_name": "headerblock",
-            "pk": 1
+            "pk": "1"
         },
         {
             "app_label": "blocks",
             "model_name": "textblock",
-            "pk": 1
+            "pk": "1"
         },
         {  # missing blocks are skipped
             "app_label": "blocks",
             "model_name": "missing",
-            "pk": 999
+            "pk": "999"
         }
     ])
 
