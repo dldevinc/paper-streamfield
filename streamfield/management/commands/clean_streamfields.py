@@ -10,8 +10,12 @@ from ...models import StreamBlockModel
 
 
 class Command(BaseCommand):
-    help = "Deletes broken references from stream fields."
+    help = "Deletes invalid references from stream fields."
+    dry_run = False
     known_blocks = set()
+
+    def add_arguments(self, parser):
+        parser.add_argument("--dry-run", action="store_true", default=False)
 
     def fill_known_blocks(self):
         for model in apps.get_models():
@@ -27,6 +31,7 @@ class Command(BaseCommand):
                 self.known_blocks.add(record)
 
     def handle(self, *args, **options):
+        self.dry_run = options["dry_run"]
         self.fill_known_blocks()
 
         for model in apps.get_models():
@@ -51,6 +56,7 @@ class Command(BaseCommand):
 
             for field_name in fields:
                 has_changes = False
+                invalid_refs = []
                 value = getattr(instance, field_name)
                 for item in value:
                     record = (
@@ -62,10 +68,22 @@ class Command(BaseCommand):
                     if record in self.known_blocks:
                         new_values[field_name].append(item)
                     else:
+                        invalid_refs.append(item)
                         has_changes = True
 
                 if not has_changes:
                     del new_values[field_name]
+                elif self.dry_run:
+                    print(
+                        "Invalid references found in object \033[91m{}.{}\033[0m "
+                        "with primary key \033[91m{}\033[0m:\n  {}".format(
+                            model._meta.app_label,
+                            model._meta.model_name,
+                            instance.pk,
+                            "\n  ".join((repr(ref) for ref in invalid_refs))
+                        )
+                    )
 
             if new_values:
-                model._base_manager.filter(pk=instance.pk).update(**new_values)
+                if not self.dry_run:
+                    model._base_manager.filter(pk=instance.pk).update(**new_values)
