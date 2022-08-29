@@ -1,9 +1,10 @@
-from typing import Dict
+from typing import Dict, Sequence
 
+from django.core.handlers.wsgi import WSGIRequest
 from django.template import Library
 from django.utils.safestring import mark_safe
 
-from ..helpers import get_stream_blocks, render_block
+from .. import blocks
 
 try:
     import jinja2
@@ -14,16 +15,29 @@ except ImportError:
 register = Library()
 
 
+def _render_stream(stream: Sequence, context: Dict, request: WSGIRequest) -> str:
+    output = []
+    for record in stream:
+        block = blocks.from_dict(record)
+        if block is not None:
+            output.append(
+                blocks.render(
+                    block,
+                    extra_context={
+                        "parent_context": context
+                    },
+                    request=request
+                )
+            )
+
+    return "\n".join(output)
+
+
 @register.simple_tag(name="render_stream", takes_context=True)
-def do_render_stream(context, stream: Dict):
+def do_render_stream(context, stream: Sequence):
     request = context.get("request", None)
-    rendered_blocks = (
-        render_block(block, {
-            "parent_context": context.flatten()
-        }, request=request)
-        for block in get_stream_blocks(stream)
-    )
-    return mark_safe("\n".join(rendered_blocks))
+    output = _render_stream(stream, context.flatten(), request=request)
+    return mark_safe(output)
 
 
 if jinja2 is not None:
@@ -49,15 +63,9 @@ if jinja2 is not None:
             return nodes.Output([call], lineno=lineno)
 
         @staticmethod
-        def _render_stream(stream: Dict, context):
+        def _render_stream(stream: Sequence, context):
             request = context.get("request", None)
-            rendered_blocks = (
-                render_block(block, {
-                    "parent_context": context
-                }, request=request)
-                for block in get_stream_blocks(stream)
-            )
-            return "\n".join(rendered_blocks)
+            return _render_stream(stream, context, request=request)
 
 
     # django-jinja support
