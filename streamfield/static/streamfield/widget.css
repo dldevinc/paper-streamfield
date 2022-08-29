@@ -1,0 +1,40 @@
+.stream-field {
+
+}
+
+
+.stream-field__textarea {
+    display: none;
+}
+
+
+.stream-field__container {
+
+}
+
+
+.stream-field__block {
+    display: flex;
+    padding: 5px;
+    border: 1px solid #d0d0d0;
+    border-radius: 0.25rem;
+}
+
+.stream-field__block:nth-of-type(n+2) {
+    margin-top: 10px;
+}
+
+
+.stream-field__icon {
+    width: 24px;
+}
+
+
+.stream-field__title {
+    margin-left: 5px;
+}
+
+
+.stream-field__tools {
+    margin-left: auto;
+}

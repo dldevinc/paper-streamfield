@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a84b0ebe-985c-4b44-b07f-f30b6a253296" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/streamfield/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/streamfield/helpers.py" afterDir="false" />
-    </list>
+    <list default="true" id="a84b0ebe-985c-4b44-b07f-f30b6a253296" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,6 +16,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="JavaScript File" />
+        <option value="CSS File" />
         <option value="HTML File" />
         <option value="Python Script" />
       </list>
@@ -38,6 +37,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="NamedScopeManager">
+    <scope name="streamfields" pattern="file[paper-streamfield]:streamfield//*||file[paper-streamfield]:tests//*" />
+  </component>
   <component name="ProjectId" id="2BQhgAScxZwHHvLCYUudK1eGEmo" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -48,24 +50,27 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_MARK_IGNORED_FILES_AS_EXCLUDED" value="true" />
+    <property name="DatabaseDriversLRU" value="sqlite" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests/blocks/jinja2" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests/tests" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="editing.templates" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests/tests" />
       <recent name="$PROJECT_DIR$/tests/blocks/jinja2" />
       <recent name="$PROJECT_DIR$/tests/app/jinja2" />
-      <recent name="$PROJECT_DIR$/tests/tests" />
       <recent name="$PROJECT_DIR$/tests/blocks/templates/blocks" />
       <recent name="$PROJECT_DIR$/tests/blocks/static/blocks/icons" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/streamfield/static/streamfield/icons" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/streamfield/static/streamfield" />
       <recent name="$PROJECT_DIR$/streamfield/field" />
@@ -93,7 +98,8 @@
       <workItem from="1661147832609" duration="1762000" />
       <workItem from="1661153073595" duration="13378000" />
       <workItem from="1661186853713" duration="3823000" />
-      <workItem from="1661320124118" duration="12184000" />
+      <workItem from="1661320124118" duration="43432000" />
+      <workItem from="1661749158244" duration="19553000" />
     </task>
     <servers />
   </component>

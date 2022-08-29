@@ -1,0 +1,36 @@
+{% load admin_urls %}
+{% load static %}
+
+<div class="stream-field__block">
+  <div class="stream-field__icon-holder">
+    <img src="{% static icon %}" class="stream-field__icon" alt="">
+  </div>
+
+  <div class="stream-field__title">
+    Block #{{ instance.pk }}
+    <br>
+    <small class="text-muted">{{ app_label }}.{{ model_name }}</small>
+  </div>
+
+  <div class="stream-field__tools">
+    <div class="btn-square-group">
+      {% if has_change_permission %}
+        {% url opts|admin_urlname:'change' instance.pk|admin_urlquote as change_url %}
+        <a href="{{ change_url }}" class="btn btn-square btn-sm btn-square--info"
+           data-toggle="tooltip" data-placement="top" data-trigger="hover"
+           data-html="true" title="{{ _("Edit") }}">
+          <i class="fa fa-pencil"></i>
+        </a>
+      {% endif %}
+
+      {% if has_delete_permission %}
+        {% url opts|admin_urlname:'delete' instance.pk|admin_urlquote as delete_url %}
+        <a href="{{ delete_url }}" class="btn btn-square btn-sm btn-square--danger"
+           data-toggle="tooltip" data-placement="top" data-trigger="hover"
+           data-html="true" title="{{ _("Delete") }}">
+          <i class="fa fa-trash"></i>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
