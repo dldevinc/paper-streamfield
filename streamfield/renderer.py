@@ -19,7 +19,7 @@ class BaseRenderer:
 class TemplateRenderer(BaseRenderer):
     context_object_name = "block"
 
-    def __call__(self, block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None):
+    def __call__(self, block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None) -> str:
         template_name = getattr(self.meta, "template", None)
         if template_name is None:
             raise ImproperlyConfigured(
