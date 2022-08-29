@@ -1,2 +1,2 @@
-DEFAULT_ICON = "streamfield/default.svg"
+DEFAULT_ICON = "streamfield/icons/default.svg"
 DEFAULT_RENDERER = "streamfield.renderer.TemplateRenderer"
