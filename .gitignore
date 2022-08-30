@@ -61,6 +61,9 @@ venv/
 # IDE settings
 .vscode/
 
+# webpack
+/cache/
+
 # tests
 /tests/db.sqlite3
 /tests/static/

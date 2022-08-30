@@ -1,0 +1,46 @@
+.stream-field {
+
+  &__control {
+    display: none;
+  }
+
+  &__container {
+
+  }
+
+  &__block {
+    display: flex;
+    padding: 5px 5px 5px 0;
+    border: 1px solid #d0d0d0;
+    border-radius: 0.25rem;
+
+    &:nth-of-type(n+2) {
+      margin-top: 10px;
+    }
+  }
+
+  &__sortable-handler {
+    padding: 3px 0;
+    margin: -5px 0;
+    cursor: move;
+  }
+
+  &__sortable-icon {
+    width: 14px;
+    height: 100%;
+    background: url(./img/sortable.svg);
+    background-size: contain;
+  }
+
+  &__icon {
+    width: 24px;
+  }
+
+  &__title {
+    margin-left: 5px;
+  }
+
+  &__tools {
+    margin-left: auto;
+  }
+}
