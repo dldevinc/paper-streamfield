@@ -24,6 +24,9 @@ def test_get_models():
 
 def test_to_dict():
     data = blocks.to_dict(Header)
+    assert "uuid" in data
+
+    data.pop("uuid")
     assert data == {
         "app_label": "blocks",
         "model_name": "headerblock",

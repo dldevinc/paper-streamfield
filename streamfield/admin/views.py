@@ -25,6 +25,7 @@ def render_streamblocks(request):
         block = blocks.from_dict(record)
         model_admin = admin.site._registry[type(block)]
         context = {
+            "uuid": record["uuid"],
             "app_label": record["app_label"],
             "model_name": record["model_name"],
             "instance": block,

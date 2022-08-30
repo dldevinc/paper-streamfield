@@ -1,4 +1,5 @@
 from typing import Any, Dict, Generator, Optional, Tuple, Type, cast
+from uuid import uuid4
 
 from django.apps import apps
 from django.core.handlers.wsgi import WSGIRequest
@@ -22,8 +23,14 @@ def get_models(registry) -> Generator[Tuple[BlockModel, Dict], Any, None]:
 def to_dict(instance: BlockInstance) -> Dict[str, str]:
     """
     Сериализация блока для JSON.
+
+    Для облегчения управления блоками на фронтенде
+    в выходной словарь добавляется значение `uuid`.
+    Оно позволяет задать двустороннее соответствие
+    между JSON-объектом и DOM-элементом.
     """
     return {
+        "uuid": str(uuid4()),
         "app_label": instance._meta.app_label,
         "model_name": instance._meta.model_name,
         "pk": str(instance.pk)
