@@ -1,36 +1,54 @@
 {% load admin_urls %}
 {% load static %}
 
-<div class="stream-field__block" data-uuid="{{ uuid }}">
+<div class="stream-field__block{% if instance is None %} stream-field__block--invalid{% endif %}" data-uuid="{{ uuid }}">
   <div class="stream-field__sortable-handler">
     <div class="stream-field__sortable-icon"></div>
   </div>
 
-  <div class="stream-field__title">
-    {{ instance }}
-    <br>
-    <small class="text-muted">{{ opts.verbose_name }}</small>
-  </div>
-
-  <div class="stream-field__tools">
-    <div class="btn-square-group">
-      {% if has_change_permission %}
-        {% url opts|admin_urlname:'change' instance.pk|admin_urlquote as change_url %}
-        <a href="{{ change_url }}" class="btn btn-square btn-sm btn-square--info"
-           data-toggle="tooltip" data-placement="top" data-trigger="hover"
-           data-html="true" title="{{ _("Edit") }}">
-          <i class="fa fa-pencil"></i>
-        </a>
-      {% endif %}
-
-      {% if has_delete_permission %}
-        {% url opts|admin_urlname:'delete' instance.pk|admin_urlquote as delete_url %}
-        <a href="{{ delete_url }}" class="btn btn-square btn-sm btn-square--danger"
-           data-toggle="tooltip" data-placement="top" data-trigger="hover"
-           data-html="true" title="{{ _("Delete") }}">
-          <i class="fa fa-trash"></i>
-        </a>
-      {% endif %}
+  {% if instance is not None %}
+    <div class="stream-field__title">
+      {{ instance }}
+      <br>
+      <small class="text-muted">{{ opts.verbose_name }}</small>
     </div>
-  </div>
+
+    <div class="stream-field__tools">
+      <div class="btn-square-group">
+        {% if has_change_permission %}
+          {% url opts|admin_urlname:'change' instance.pk|admin_urlquote as change_url %}
+          <a href="{{ change_url }}" class="btn btn-square btn-sm btn-square--info"
+             data-toggle="tooltip" data-placement="top" data-trigger="hover"
+             data-html="true" title="{{ _("Edit") }}">
+            <i class="fa fa-pencil"></i>
+          </a>
+        {% endif %}
+
+        {% if has_delete_permission %}
+          {% url opts|admin_urlname:'delete' instance.pk|admin_urlquote as delete_url %}
+          <a href="{{ delete_url }}" class="btn btn-square btn-sm btn-square--danger"
+             data-toggle="tooltip" data-placement="top" data-trigger="hover"
+             data-html="true" title="{{ _("Delete") }}">
+            <i class="fa fa-trash"></i>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div class="stream-field__title stream-field__title--invalid">
+      {{ _("Invalid block") }}
+      <br>
+      <small class="text-muted">{{ app_label }}.{{ model_name }} #{{ pk }}</small>
+    </div>
+
+    <div class="stream-field__tools">
+      <div class="btn-square-group">
+        <button type="button" class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
+                data-toggle="tooltip" data-placement="top" data-trigger="hover"
+                data-html="true" title="{{ _("Delete") }}">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  {% endif %}
 </div>

@@ -8,18 +8,68 @@ const modals = window.paperAdmin.modals;
 
 
 class StreamField {
+    static STATUS = {
+        LOADING: "loading",
+        READY: "ready"
+    };
+
+    static CSS = {
+        field: "stream-field",
+        input: "stream-field__control",
+        container: "stream-field__container",
+        block: "stream-field__block"
+    };
+
     constructor(element) {
         this.field = element;
-        this.container = this.field.querySelector(".stream-field__container");
-        this.control = this.field.querySelector(".stream-field__control");
+        this.container = this.field.querySelector(`.${this.CSS.container}`);
+        this.control = this.field.querySelector(`.${this.CSS.input}`);
 
         this.blockMap = this.buildBlockMap();
-        this._initSortable();
+        this._sortable = this._initSortable();
+        this._addEventListeners();
 
         this.render(this.control.value);
     }
 
+    get STATUS() {
+        return this.constructor.STATUS;
+    }
+
+    get CSS() {
+        return this.constructor.CSS;
+    }
+
+    /**
+     * @returns {string}
+     */
+    getStatus() {
+        return Object.values(this.STATUS).find(value => {
+            return this.field.classList.contains(`${this.CSS.field}--${value}`);
+        });
+    }
+
+    /**
+     * @param {string} status
+     */
+    setStatus(status) {
+        Object.values(this.STATUS).forEach(value => {
+            this.field.classList.toggle(`${this.CSS.field}--${value}`, status === value);
+        });
+    }
+
+    /**
+     * @returns {HTMLElement[]}
+     */
+    getBlocks() {
+        return Array.from(this.container.querySelectorAll(`.${this.CSS.block}`))
+    }
+
     destroy() {
+        if (this._sortable) {
+            this._sortable.destroy();
+        }
+
         // TODO
     }
 
@@ -43,6 +93,16 @@ class StreamField {
         return Sortable.create(this.container, {
             animation: 0,
             draggable: ".stream-field__block",
+            filter: (event, target) => {
+                const status = this.getStatus();
+                if (status === this.STATUS.LOADING) {
+                    return true;
+                }
+
+                if (!target) {
+                    return true;
+                }
+            },
             handle: ".stream-field__sortable-handler",
             ghostClass: "sortable-ghost",
             onEnd: () => {
@@ -51,15 +111,21 @@ class StreamField {
         });
     }
 
-    showPreloader() {
-        this.container.innerHTML =
-            `<div class="spinner-border text-info" role="status">
-              <span class="sr-only">${gettext("Loading...")}</span>
-            </div>`;
+    _addEventListeners() {
+        this.field.addEventListener("click", event => {
+            const deleteButton = event.target.closest(".stream-field__delete-btn");
+            if (!deleteButton) {
+                return
+            }
+
+            const block = event.target.closest(".stream-field__block");
+            block.classList.add("stream-field__block--removing");
+            // TODO
+        });
     }
 
     render(json_data) {
-        this.showPreloader();
+        this.setStatus(this.STATUS.LOADING);
 
         const renderUrl = this.field.dataset.renderUrl;
         return fetch(renderUrl, {
@@ -75,20 +141,22 @@ class StreamField {
             return response.json()
         }).then(data => {
             this.container.innerHTML = data.html || "";
+            this.setStatus(this.STATUS.READY);
         }).catch(reason => {
             if (reason instanceof Error) {
                 // JS-ошибки дублируем в консоль
                 console.error(reason);
             }
             modals.showErrors(reason);
+            this.setStatus(this.STATUS.READY);
         });
     }
 
     save() {
-        const newValue = Array.from(this.container.querySelectorAll(".stream-field__block")).map(block => {
+        const newValue = this.getBlocks().map(block => {
             const uuid = block.dataset.uuid;
             return this.blockMap[uuid];
-        }).filter(Boolean);
+        });
         this.control.value = JSON.stringify(newValue);
     }
 }

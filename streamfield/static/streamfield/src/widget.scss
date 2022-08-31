@@ -5,7 +5,7 @@
   }
 
   &__container {
-
+    min-height: 50px;
   }
 
   &__block {
@@ -21,6 +21,14 @@
     &.sortable-ghost {
       opacity: 0.75;
       background-color: #feffd7;
+    }
+
+    &--invalid {
+      border-color: #e78b8b;
+    }
+
+    &--removing {
+
     }
   }
 
@@ -39,9 +47,29 @@
 
   &__title {
     margin-left: 5px;
+
+    &--invalid {
+      color: #d04010;
+    }
   }
 
   &__tools {
     margin-left: auto;
+  }
+
+
+  &--loading &__container {
+    position: relative;
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 0.25rem;
+      background: #f0f0f0b0 url("./img/spinner.svg") no-repeat center;
+    }
   }
 }
