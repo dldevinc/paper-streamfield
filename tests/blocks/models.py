@@ -28,7 +28,6 @@ class HeaderBlock(StreamBlockModel):
         verbose_name_plural = "Headers"
 
     class StreamBlockMeta:
-        admin_icon = "blocks/icons/header.svg"
         template = "blocks/header.html"
 
     def __str__(self):
@@ -45,7 +44,6 @@ class TextBlock(StreamBlockModel):
         verbose_name_plural = "Text"
 
     class StreamBlockMeta:
-        admin_icon = "blocks/icons/text.svg"
         template = "blocks/text.html"
 
     def __str__(self):
@@ -72,7 +70,6 @@ class ImageBlock(StreamBlockModel):
         verbose_name_plural = "Images"
 
     class StreamBlockMeta:
-        admin_icon = "blocks/icons/image.svg"
         template = "blocks/image.html"
 
     def __str__(self):

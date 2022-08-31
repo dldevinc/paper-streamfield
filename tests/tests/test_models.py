@@ -9,6 +9,5 @@ def test_stream_meta_class():
 
 def test_stream_meta_fields():
     stream_meta = HeaderBlock._stream_meta
-    assert stream_meta.admin_icon == "blocks/icons/header.svg"
     assert stream_meta.template == "blocks/header.html"
     assert stream_meta.renderer == "streamfield.renderer.TemplateRenderer"

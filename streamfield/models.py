@@ -37,7 +37,6 @@ class StreamBlockMetaClass(ModelBase):
             if not name.startswith("_")
         } if meta_class else {}
 
-        meta_attrs.setdefault("admin_icon", conf.DEFAULT_ICON)
         meta_attrs.setdefault("renderer", conf.DEFAULT_RENDERER)
 
         new_class._stream_meta = Options(**meta_attrs)

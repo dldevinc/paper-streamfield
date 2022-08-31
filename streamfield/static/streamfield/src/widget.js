@@ -4,6 +4,7 @@ import "./widget.scss";
 
 const Sortable = window.paperAdmin.Sortable;
 const Widget = window.paperAdmin.Widget;
+const modals = window.paperAdmin.modals;
 
 
 class StreamField {
@@ -12,11 +13,42 @@ class StreamField {
         this.container = this.field.querySelector(".stream-field__container");
         this.control = this.field.querySelector(".stream-field__control");
 
+        this.blockMap = this.buildBlockMap();
+        this._initSortable();
+
         this.render(this.control.value);
     }
 
     destroy() {
         // TODO
+    }
+
+    buildBlockMap() {
+        let value;
+
+        try {
+            value = JSON.parse(this.control.value);
+        } catch {
+            value = {};
+        }
+
+        const result = {};
+        for (const record of value) {
+            result[record["uuid"]] = record;
+        }
+        return result
+    }
+
+    _initSortable() {
+        return Sortable.create(this.container, {
+            animation: 0,
+            draggable: ".stream-field__block",
+            handle: ".stream-field__sortable-handler",
+            ghostClass: "sortable-ghost",
+            onEnd: () => {
+                this.save();
+            }
+        });
     }
 
     showPreloader() {
@@ -30,7 +62,7 @@ class StreamField {
         this.showPreloader();
 
         const renderUrl = this.field.dataset.renderUrl;
-        fetch(renderUrl, {
+        return fetch(renderUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json;charset=utf-8"
@@ -42,10 +74,22 @@ class StreamField {
             }
             return response.json()
         }).then(data => {
-            if (data.status === "OK") {
-                this.container.innerHTML = data.html;
+            this.container.innerHTML = data.html || "";
+        }).catch(reason => {
+            if (reason instanceof Error) {
+                // JS-ошибки дублируем в консоль
+                console.error(reason);
             }
+            modals.showErrors(reason);
         });
+    }
+
+    save() {
+        const newValue = Array.from(this.container.querySelectorAll(".stream-field__block")).map(block => {
+            const uuid = block.dataset.uuid;
+            return this.blockMap[uuid];
+        }).filter(Boolean);
+        this.control.value = JSON.stringify(newValue);
     }
 }
 

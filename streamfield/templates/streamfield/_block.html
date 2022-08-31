@@ -6,14 +6,10 @@
     <div class="stream-field__sortable-icon"></div>
   </div>
 
-  <div class="stream-field__icon-holder">
-    <img src="{% static icon %}" class="stream-field__icon" alt="">
-  </div>
-
   <div class="stream-field__title">
-    Block #{{ instance.pk }}
+    {{ instance }}
     <br>
-    <small class="text-muted">{{ app_label }}.{{ model_name }}</small>
+    <small class="text-muted">{{ opts.verbose_name }}</small>
   </div>
 
   <div class="stream-field__tools">
