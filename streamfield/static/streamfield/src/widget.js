@@ -114,13 +114,43 @@ class StreamField {
     _addEventListeners() {
         this.field.addEventListener("click", event => {
             const deleteButton = event.target.closest(".stream-field__delete-btn");
-            if (!deleteButton) {
-                return
-            }
+            if (deleteButton) {
+                event.preventDefault();
+                deleteButton.disabled = true;
 
-            const block = event.target.closest(".stream-field__block");
-            block.classList.add("stream-field__block--removing");
-            // TODO
+                modals.createModal({
+                    modalClass: "paper-modal--warning fade",
+                    title: gettext("Confirm deletion"),
+                    body: gettext("Are you sure you want to <b>DELETE</b> this block?"),
+                    buttons: [
+                        {
+                            label: gettext("Cancel"),
+                            buttonClass: "btn-light",
+                            onClick: (event, popup) => {
+                                popup.destroy();
+                            }
+                        },
+                        {
+                            autofocus: true,
+                            label: gettext("Delete"),
+                            buttonClass: "btn-danger",
+                            onClick: (event, popup) => {
+                                popup.destroy();
+
+                                const block = deleteButton.closest(`.${this.CSS.block}`);
+                                block.remove();
+                                this.save();
+                            }
+                        }
+                    ],
+                    onInit: function() {
+                        this.show();
+                    },
+                    onDestroy: function() {
+                        deleteButton.disabled = false;
+                    }
+                });
+            }
         });
     }
 

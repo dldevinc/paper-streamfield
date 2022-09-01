@@ -6,6 +6,19 @@
 
   &__container {
     min-height: 50px;
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      z-index: -1;
+      border-radius: 0.25rem;
+      transition: opacity 0.3s;
+    }
   }
 
   &__block {
@@ -39,14 +52,14 @@
   }
 
   &__sortable-icon {
-    width: 14px;
+    width: 16px;
     height: 100%;
     background: url(./img/sortable.svg);
     background-size: contain;
   }
 
   &__title {
-    margin-left: 5px;
+    margin-left: 6px;
 
     &--invalid {
       color: #d04010;
@@ -62,13 +75,8 @@
     position: relative;
 
     &:after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 0.25rem;
+      z-index: auto;
+      opacity: 1;
       background: #f0f0f0b0 url("./img/spinner.svg") no-repeat center;
     }
   }
