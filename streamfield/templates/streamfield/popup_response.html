@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>{{ _("Popup closing...") }}</title></head>
+<body>
+<script>
+    const initData = {{ popup_response_data|safe }};
+    switch (initData.action) {
+        case "change":
+            opener.dismissChangeStreamBlockPopup(window);
+            break;
+        default:
+            break;
+    }
+</script>
+</body>
+</html>
