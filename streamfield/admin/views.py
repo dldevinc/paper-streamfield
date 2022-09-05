@@ -2,7 +2,7 @@ import json
 from json import JSONDecodeError
 from typing import Any, Dict, List
 
-from django.contrib import admin
+from django.contrib.admin.sites import site as default_site
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -16,6 +16,8 @@ from ..typing import BlockInstance
 class RenderFieldView(View):
     """
     Отрисовка поля StreamField в соответствии с переданными JSON-данными.
+
+    # TODO: как получить актуальный admin_site?
     """
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -48,7 +50,7 @@ class RenderFieldView(View):
             return self._render_valid_block(block_data, block_instance)
 
     def _render_valid_block(self, block_data: Dict[str, Any], block: BlockInstance) -> str:
-        model_admin = admin.site._registry[type(block)]
+        model_admin = default_site._registry[type(block)]
         info = (block._meta.app_label, block._meta.model_name)
 
         change_related_url = reverse(

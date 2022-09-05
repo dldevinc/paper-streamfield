@@ -1,6 +1,7 @@
 from typing import Type, Union
 from unittest.mock import Mock
 
+from django.contrib.admin import AdminSite
 from django.db.models import Model
 
 from streamfield.registry import Registry
@@ -8,51 +9,86 @@ from streamfield.registry import Registry
 ProductModel = Mock(_meta=Mock(app_label="shop", model_name="product"))  # type: Union[Mock, Type[Model]]
 ArticleModel = Mock(_meta=Mock(app_label="blog", model_name="article"))  # type: Union[Mock, Type[Model]]
 
+MobileAdminSite = Mock(spec=AdminSite(name="mobile"))
+MobileAdminSite.name = "mobile"
 
-def test_len():
+
+def test_inner_len():
     registry = Registry()
-    assert len(registry) == 0
+    assert len(registry._registry) == 0
 
     registry.register(ProductModel)
-    assert len(registry) == 1
+    assert len(registry["admin"]) == 1
 
-    registry.register(ArticleModel)
-    assert len(registry) == 2
+    registry.register(ArticleModel, site=MobileAdminSite)
+    assert len(registry["admin"]) == 1
+    assert len(registry["mobile"]) == 1
+
+
+def test_getitem():
+    registry = Registry()
+    registry.register(ProductModel)
+    assert isinstance(registry["admin"], set)
+
+    registry.register(ArticleModel, site=MobileAdminSite)
+    assert isinstance(registry["mobile"], set)
 
 
 def test_contains():
     registry = Registry()
+
+    assert "admin" not in registry
     registry.register(ProductModel)
-    assert ProductModel in registry
-    assert ("shop", "product") in registry
-    assert "shop.product" in registry
+    assert "admin" in registry
+
+    assert "mobile" not in registry
+    registry.register(ArticleModel, site=MobileAdminSite)
+    assert "mobile" in registry
 
 
-def test_contains_fail():
+def test_register():
     registry = Registry()
     registry.register(ProductModel)
-    assert ArticleModel not in registry
-    assert "blog.article" not in registry
+    registry.register(ArticleModel, site=MobileAdminSite)
+
+    assert registry["admin"] == {
+        ("shop", "product"),
+    }
+
+    assert registry["mobile"] == {
+        ("blog", "article"),
+    }
+
+
+def test_is_registered():
+    registry = Registry()
+    registry.register(ProductModel)
+    registry.register(ArticleModel, site=MobileAdminSite)
+
+    assert registry.is_registered(ProductModel)
+    assert registry.is_registered(ArticleModel, site=MobileAdminSite)
 
 
 def test_unregister():
     registry = Registry()
-
     registry.register(ProductModel)
-    assert len(registry) == 1
-    assert ProductModel in registry
+    registry.register(ArticleModel, site=MobileAdminSite)
 
+    assert registry.is_registered(ProductModel)
     registry.unregister(ProductModel)
-    assert len(registry) == 0
-    assert ProductModel not in registry
+    assert registry.is_registered(ProductModel) is False
+
+    assert registry.is_registered(ArticleModel, site=MobileAdminSite)
+    registry.unregister(ArticleModel, site=MobileAdminSite)
+    assert registry.is_registered(ArticleModel, site=MobileAdminSite) is False
 
 
-def test_duplicate_register():
+def test_double_register():
     registry = Registry()
-    assert len(registry) == 0
+    assert len(registry["admin"]) == 0
 
     registry.register(ProductModel)
-    assert len(registry) == 1
+    assert len(registry["admin"]) == 1
 
     registry.register(ProductModel)
-    assert len(registry) == 1
+    assert len(registry["admin"]) == 1

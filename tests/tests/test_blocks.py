@@ -1,25 +1,14 @@
 from unittest.mock import Mock
 
 import pytest
-from blocks.models import HeaderBlock, TextBlock
+from blocks.models import HeaderBlock
 
 from streamfield import blocks
-from streamfield.registry import Registry
 
 Header = Mock(
     pk=1,
     _meta=Mock(app_label="blocks", model_name="headerblock")
 )
-
-
-def test_get_models():
-    registry = Registry()
-    registry.register(HeaderBlock)
-    registry.register(TextBlock)
-
-    models = list(blocks.get_models(registry))
-    assert len(models) == 2
-    assert models == [HeaderBlock, TextBlock]
 
 
 def test_to_dict():

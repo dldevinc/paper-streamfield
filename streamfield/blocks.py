@@ -1,23 +1,15 @@
-from typing import Any, Dict, Generator, Optional, Tuple, Type, cast
+from typing import Dict, Optional, Type, cast
 from uuid import uuid4
 
 from django.apps import apps
 from django.core.handlers.wsgi import WSGIRequest
+from django.utils.module_loading import import_string
 
-from . import conf, utils
+from . import conf
 from .logging import logger
 from .models import StreamBlockMetaClass
 from .renderer import BaseRenderer
-from .typing import BlockInstance, BlockModel
-
-
-def get_models(registry) -> Generator[Tuple[BlockModel, Dict], Any, None]:
-    """
-    Возвращает модели всех блоков.
-    """
-    for app_name, model_name in registry:
-        model = apps.get_model(app_name, model_name)
-        yield model
+from .typing import BlockInstance
 
 
 def to_dict(instance: BlockInstance) -> Dict[str, str]:
@@ -74,11 +66,14 @@ def from_dict(value: Dict[str, str]) -> Optional[BlockInstance]:
 
 def render(block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None) -> str:
     """
-    Отрисовка блока.
+    Отрисовка экземпляра блока.
     """
     renderer = getattr(block._stream_meta, "renderer", conf.DEFAULT_RENDERER)
     if isinstance(renderer, str):
-        renderer = utils.import_render_func(renderer)
+        renderer_name = renderer
+        renderer = import_string(renderer_name)
+        if not callable(renderer):
+            raise ImportError("%s object is not callable" % renderer_name)
 
     if isinstance(renderer, type):
         renderer = cast(Type[BaseRenderer], renderer)

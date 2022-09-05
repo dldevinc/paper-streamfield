@@ -1,1 +1,1 @@
-from .base import StreamBlockAdmin
+from .base import ModelAdmin, register
