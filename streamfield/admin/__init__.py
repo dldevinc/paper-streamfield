@@ -1,1 +1,1 @@
-from .base import ModelAdmin, register
+from .base import StreamBlockModelAdmin, StreamBlockModelAdminMixin

@@ -7,55 +7,52 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
 from django.template import TemplateDoesNotExist
 
-from streamfield.models import Options
-from streamfield.renderer import TemplateRenderer
+from streamfield.renderer import render_template, resolve_template
 
 DummyModel = Mock(spec=[])  # type: Union[Mock, Type[Model]]
 
 
 def test_resolve_template_with_string():
-    renderer = TemplateRenderer(DummyModel)
-    template = renderer.resolve_template("blocks/header.html")
+    template = resolve_template("blocks/header.html")
     assert template.template.name == "blocks/header.html"
 
 
 def test_resolve_template_with_tuple():
-    renderer = TemplateRenderer(DummyModel)
-    template = renderer.resolve_template(
+    template = resolve_template(
         ("blocks/missing.html", "blocks/header.html")
     )
     assert template.template.name == "blocks/header.html"
 
 
 def test_resolve_template_fail():
-    renderer = TemplateRenderer(DummyModel)
     with pytest.raises(TemplateDoesNotExist):
-        renderer.resolve_template("blocks/missing.html")
+        resolve_template("blocks/missing.html")
 
 
 def test_render_template():
-    renderer = TemplateRenderer(Mock(  # noqa
-        _stream_meta=Options(
-            template="blocks/header.html"
-        )
-    ))
     instance = HeaderBlock(text="Example header")
-    assert renderer(instance) == "<h1>Example header</h1>"
+    assert render_template(instance) == "<h1>Example header</h1>"
 
 
 def test_render_undefined_template():
-    renderer = TemplateRenderer(DummyModel)
-    instance = HeaderBlock(text="Example header")
     with pytest.raises(ImproperlyConfigured):
-        assert renderer(instance)
+        assert render_template(Mock(
+            spec=["text", "_meta"],
+            _meta=Mock(
+                app_label="blocks",
+                model_name="headerblock",
+            ),
+            text="Example header"
+        ))
 
 
 def test_render_missing_template():
-    renderer = TemplateRenderer(Mock(  # noqa
-        _stream_meta=Options(
-            template="blocks/missing.html"
-        )
-    ))
-    instance = HeaderBlock(text="Example header")
     with pytest.raises(TemplateDoesNotExist):
-        assert renderer(instance)
+        assert render_template(Mock(
+            spec=["block_template", "_meta"],
+            _meta=Mock(
+                app_label="blocks",
+                model_name="headerblock",
+            ),
+            block_template="blocks/missing.html"
+        ))

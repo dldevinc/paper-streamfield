@@ -1,7 +1,7 @@
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Type
 
-from .models import StreamBlockMetaClass, StreamBlockModel
+from django.db import models
 
-BlockModel = StreamBlockMetaClass
-BlockInstance = StreamBlockModel
+BlockModel = Type[models.Model]
+BlockInstance = models.Model
 RenderFuncCallable = Callable[[BlockInstance, Dict[str, Any]], str]

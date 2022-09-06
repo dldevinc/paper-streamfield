@@ -17,7 +17,11 @@ class Page(models.Model):
         _("text"),
         blank=True
     )
-    stream = StreamField(_("stream"))
+    stream = StreamField(_("stream"), models=[
+        "blocks.HeaderBlock",
+        "blocks.ImageBlock",
+        "blocks.TextBlock",
+    ])
 
     class Meta:
         verbose_name = "Page"

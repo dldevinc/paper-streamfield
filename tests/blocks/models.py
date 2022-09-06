@@ -3,10 +3,10 @@ from django.db import models
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
-from streamfield.models import StreamBlockModel
 
+class HeaderBlock(models.Model):
+    block_template = "blocks/header.html"
 
-class HeaderBlock(StreamBlockModel):
     text = models.CharField(
         _("text"),
         max_length=255
@@ -27,14 +27,13 @@ class HeaderBlock(StreamBlockModel):
         verbose_name = "Header"
         verbose_name_plural = "Headers"
 
-    class StreamBlockMeta:
-        template = "blocks/header.html"
-
     def __str__(self):
         return self.text
 
 
-class TextBlock(StreamBlockModel):
+class TextBlock(models.Model):
+    block_template = "blocks/text.html"
+
     text = models.TextField(
         _("text")
     )
@@ -43,14 +42,13 @@ class TextBlock(StreamBlockModel):
         verbose_name = "Text"
         verbose_name_plural = "Text"
 
-    class StreamBlockMeta:
-        template = "blocks/text.html"
-
     def __str__(self):
         return Truncator(self.text).chars(64)
 
 
-class ImageBlock(StreamBlockModel):
+class ImageBlock(models.Model):
+    block_template = "blocks/image.html"
+
     image = models.ImageField(
         _("image")
     )
@@ -68,9 +66,6 @@ class ImageBlock(StreamBlockModel):
     class Meta:
         verbose_name = "Image"
         verbose_name_plural = "Images"
-
-    class StreamBlockMeta:
-        template = "blocks/image.html"
 
     def __str__(self):
         return self.title or "Image #{}".format(self.pk)

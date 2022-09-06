@@ -7,6 +7,7 @@ class StreamField(JSONField):
     _default_hint = ("list", "[]")
 
     def __init__(self, *args, **kwargs):
+        self.models = kwargs.pop("models", [])
         default = kwargs.get("default")
         if default is NOT_PROVIDED or default is None:
             kwargs["default"] = list
@@ -25,6 +26,7 @@ class StreamField(JSONField):
         return super().formfield(
             **{
                 "form_class": forms.StreamField,
+                "models": self.models,
                 **kwargs,
             }
         )

@@ -4,14 +4,15 @@
   </div>
 
   <div class="stream-field__title stream-field__title--invalid">
-    {{ _("Invalid block") }}
+    {{ title }}
     <br>
-    <small class="text-muted">{{ app_label }}.{{ model_name }} #{{ pk }}</small>
+    <small class="text-muted">{{ description }}</small>
   </div>
 
   <div class="stream-field__tools">
     <div class="btn-square-group">
-      <button type="button" class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
+      <button type="button"
+              class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
               data-toggle="tooltip" data-placement="top" data-trigger="hover"
               data-html="true" title="{{ _("Delete") }}">
         <i class="fa fa-trash"></i>

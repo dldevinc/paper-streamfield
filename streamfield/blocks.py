@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Type, cast
+from typing import Dict
 from uuid import uuid4
 
 from django.apps import apps
@@ -6,10 +6,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.utils.module_loading import import_string
 
 from . import conf
-from .logging import logger
-from .models import StreamBlockMetaClass
-from .renderer import BaseRenderer
-from .typing import BlockInstance
+from .typing import BlockInstance, BlockModel
 
 
 def to_dict(instance: BlockInstance) -> Dict[str, str]:
@@ -21,54 +18,45 @@ def to_dict(instance: BlockInstance) -> Dict[str, str]:
     Оно позволяет задать двустороннее соответствие
     между JSON-объектом и DOM-элементом.
     """
+    opts = instance._meta
     return {
         "uuid": str(uuid4()),
-        "app_label": instance._meta.app_label,
-        "model_name": instance._meta.model_name,
+        "model": f"{opts.app_label}.{opts.model_name}",
         "pk": str(instance.pk)
     }
 
 
-def from_dict(value: Dict[str, str]) -> Optional[BlockInstance]:
+def is_valid(value: Dict[str, str]) -> bool:
+    """
+    Проверяет корректность словаря, представляющего блок.
+    """
+    if not isinstance(value, dict):
+        return False
+
+    required_keys = {"uuid", "model", "pk"}
+    if required_keys.difference(value.keys()):
+        return False
+
+    if not all(isinstance(value[key], str) for key in required_keys):
+        return False
+
+    return True
+
+
+def from_dict(value: Dict[str, str]) -> BlockInstance:
     """
     Возвращает экземпляр блока из словаря,
     созданного с помощью функции `to_dict()`.
     """
-    try:
-        model = apps.get_model(
-            value["app_label"],
-            value["model_name"]
-        )
-    except LookupError:
-        logger.warning(
-            "Model '%(app_label)s.%(model_name)s' not found."
-            % value
-        )
-        return
-
-    if not isinstance(model, StreamBlockMetaClass):
-        logger.warning(
-            "Model '%(app_label)s.%(model_name)s' is not a stream block."
-            % value
-        )
-        return
-
-    instance = model._base_manager.filter(pk=value["pk"]).first()
-    if instance is None:
-        logger.warning(
-            "Object '%(app_label)s.%(model_name)s' with primary key '%(pk)s' does not exist."
-            % value
-        )
-        return
-
-    return instance
+    model = apps.get_model(value["model"])  # type: BlockModel
+    return model._base_manager.get(pk=value["pk"])
 
 
 def render(block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None) -> str:
     """
     Отрисовка экземпляра блока.
     """
-    renderer = getattr(block._stream_meta, "renderer", conf.DEFAULT_RENDERER)
+    renderer = getattr(block, "block_renderer", conf.DEFAULT_BLOCK_RENDERER)
     if isinstance(renderer, str):
         renderer_name = renderer
         renderer = import_string(renderer_name)
@@ -76,7 +64,6 @@ def render(block: BlockInstance, extra_context: Dict = None, request: WSGIReques
             raise ImportError("%s object is not callable" % renderer_name)
 
     if isinstance(renderer, type):
-        renderer = cast(Type[BaseRenderer], renderer)
-        renderer = renderer(type(block))
+        renderer = renderer()
 
     return renderer(block, extra_context, request=request)

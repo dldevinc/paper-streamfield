@@ -16,21 +16,22 @@ class StreamField {
 
     static CSS = {
         field: "stream-field",
-        input: "stream-field__control",
+        control: "stream-field__control",
         container: "stream-field__container",
-        block: "stream-field__block"
+        block: "stream-field__block",
     };
 
     constructor(element) {
         this.field = element;
         this.container = this.field.querySelector(`.${this.CSS.container}`);
-        this.control = this.field.querySelector(`.${this.CSS.input}`);
+        this.control = this.field.querySelector(`.${this.CSS.control}`);
 
+        this.allowedModels = JSON.parse(this.control.dataset.allowedModels);
         this.blockMap = this.buildBlockMap();
         this._sortable = this._initSortable();
-        this._addEventListeners();
+        this._addListeners();
 
-        this.render(this.control.value);
+        this.update();
     }
 
     get STATUS() {
@@ -41,16 +42,22 @@ class StreamField {
         return this.constructor.CSS;
     }
 
+    /**
+     * @returns {Array}
+     */
     get value() {
         let data;
         try {
             data = JSON.parse(this.control.value);
         } catch {
-            data = {};
+            data = [];
         }
         return data
     }
 
+    /**
+     * @param {string|Array} data
+     */
     set value(data) {
         if (typeof data !== "string") {
             data = JSON.stringify(data);
@@ -61,7 +68,7 @@ class StreamField {
     /**
      * @returns {string}
      */
-    getStatus() {
+    get status() {
         return Object.values(this.STATUS).find(value => {
             return this.field.classList.contains(`${this.CSS.field}--${value}`);
         });
@@ -70,7 +77,7 @@ class StreamField {
     /**
      * @param {string} status
      */
-    setStatus(status) {
+    set status(status) {
         Object.values(this.STATUS).forEach(value => {
             this.field.classList.toggle(`${this.CSS.field}--${value}`, status === value);
         });
@@ -91,6 +98,10 @@ class StreamField {
         // TODO
     }
 
+    /**
+     * Создаёт объект для быстрого поиска блоков по UUID.
+     * @returns {Object}
+     */
     buildBlockMap() {
         const result = {};
         for (const record of this.value) {
@@ -99,13 +110,16 @@ class StreamField {
         return result
     }
 
+    /**
+     * @returns {*}
+     * @private
+     */
     _initSortable() {
         return Sortable.create(this.container, {
             animation: 0,
             draggable: ".stream-field__block",
             filter: (event, target) => {
-                const status = this.getStatus();
-                if (status === this.STATUS.LOADING) {
+                if (this.status === this.STATUS.LOADING) {
                     return true;
                 }
 
@@ -121,7 +135,7 @@ class StreamField {
         });
     }
 
-    _addEventListeners() {
+    _addListeners() {
         this.field.addEventListener("click", event => {
             const deleteButton = event.target.closest(".stream-field__delete-btn");
             if (deleteButton) {
@@ -186,7 +200,7 @@ class StreamField {
     }
 
     render(data) {
-        this.setStatus(this.STATUS.LOADING);
+        this.status = this.STATUS.LOADING;
 
         if (typeof data !== "string") {
             data = JSON.stringify(data);
@@ -208,14 +222,14 @@ class StreamField {
             return response.json()
         }).then(data => {
             this.container.innerHTML = data.rendered_field || "";
-            this.setStatus(this.STATUS.READY);
+            this.status = this.STATUS.READY;
         }).catch(reason => {
             if (reason instanceof Error) {
                 // JS-ошибки дублируем в консоль
                 console.error(reason);
             }
             modals.showErrors(reason);
-            this.setStatus(this.STATUS.READY);
+            this.status = this.STATUS.READY;
         });
     }
 

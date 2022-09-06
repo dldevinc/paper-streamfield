@@ -1,4 +1,5 @@
-<div class="stream-field" data-render-url="{% url "streamfields:render" %}">
+<div class="stream-field"
+     data-render-url="{% url "streamfields:render" %}">
   <textarea name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>{{ widget.value|default:"" }}</textarea>
   <div class="stream-field__container"></div>
 </div>

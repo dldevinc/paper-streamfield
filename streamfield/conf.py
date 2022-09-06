@@ -1,1 +1,1 @@
-DEFAULT_RENDERER = "streamfield.renderer.TemplateRenderer"
+DEFAULT_BLOCK_RENDERER = "streamfield.renderer.render_template"

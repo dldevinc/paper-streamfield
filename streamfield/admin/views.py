@@ -1,23 +1,51 @@
 import json
 from json import JSONDecodeError
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
-from django.contrib.admin.sites import site as default_site
+from django.contrib.auth import get_permission_codename
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from .. import blocks
-from ..typing import BlockInstance
+from ..logging import logger
+from ..typing import BlockInstance, BlockModel
 
 
-class RenderFieldView(View):
+class PermissionMixin:
+    def has_add_permission(self, model: BlockModel):
+        opts = model._meta
+        codename = get_permission_codename("add", opts)
+        return self.request.user.has_perm("%s.%s" % (opts.app_label, codename))
+
+    def has_change_permission(self, model_or_block: Union[BlockModel, BlockInstance]):
+        opts = model_or_block._meta
+        codename = get_permission_codename("change", opts)
+        return self.request.user.has_perm("%s.%s" % (opts.app_label, codename))
+
+    def has_delete_permission(self, model_or_block: Union[BlockModel, BlockInstance]):
+        opts = model_or_block._meta
+        codename = get_permission_codename("delete", opts)
+        return self.request.user.has_perm("%s.%s" % (opts.app_label, codename))
+
+    def has_view_permission(self, model_or_block: Union[BlockModel, BlockInstance]):
+        opts = model_or_block._meta
+        codename_view = get_permission_codename("view", opts)
+        codename_change = get_permission_codename("change", opts)
+        return self.request.user.has_perm(
+            "%s.%s" % (opts.app_label, codename_view)
+        ) or self.request.user.has_perm(
+            "%s.%s" % (opts.app_label, codename_change)
+        )
+
+
+class RenderFieldView(PermissionMixin, View):
     """
     Отрисовка поля StreamField в соответствии с переданными JSON-данными.
-
-    # TODO: как получить актуальный admin_site?
     """
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -27,9 +55,15 @@ class RenderFieldView(View):
         try:
             stream = json.loads(request.body)
         except JSONDecodeError:
+            logger.warning("Stream is not valid JSON")
             return HttpResponseBadRequest()
 
         if not isinstance(stream, list):
+            logger.warning("Invalid stream type")
+            return HttpResponseBadRequest()
+
+        if not all(blocks.is_valid(record) for record in stream):
+            logger.warning("Invalid stream value")
             return HttpResponseBadRequest()
 
         return JsonResponse({
@@ -42,38 +76,33 @@ class RenderFieldView(View):
             for block_data in stream
         )
 
-    def _render_block(self, block_data: Dict[str, Any]) -> str:
-        block_instance = blocks.from_dict(block_data)
-        if block_instance is None:
-            return self._render_invalid_block(block_data)
+    def _render_block(self, record: Dict[str, Any]) -> str:
+        try:
+            block = blocks.from_dict(record)
+        except (LookupError, ObjectDoesNotExist, MultipleObjectsReturned):
+            return self._block_invalid(record)
         else:
-            return self._render_valid_block(block_data, block_instance)
+            return self._block_valid(block)
 
-    def _render_valid_block(self, block_data: Dict[str, Any], block: BlockInstance) -> str:
-        model_admin = default_site._registry[type(block)]
+    def _block_valid(self, block: BlockInstance) -> str:
         info = (block._meta.app_label, block._meta.model_name)
 
-        change_related_url = reverse(
-            "admin:%s_%s_%s" % (info + ("change",)),
-            current_app=model_admin.admin_site.name,
-            args=(block.pk, ),
-        )
-
-        return render_to_string("streamfield/_valid_block.html", {
-            "uuid": block_data["uuid"],
-            "instance": block,
-            "opts": block._meta,
-            "can_add_related": model_admin.has_add_permission(self.request),
-            "can_change_related": model_admin.has_change_permission(self.request, block),
-            "change_related_url": change_related_url,
-            "can_delete_related": model_admin.has_delete_permission(self.request, block),
-            "can_view_related": model_admin.has_view_permission(self.request, block),
+        context = dict(blocks.to_dict(block), **{
+            "title": str(block),
+            "description": block._meta.verbose_name,
+            "change_related_url": reverse(
+                "admin:%s_%s_%s" % (info + ("change",)),
+                args=(block.pk,),
+            ),
+            "can_change_related": self.has_change_permission(block),
+            "can_view_related": self.has_view_permission(block),
         })
 
-    def _render_invalid_block(self, block_data: Dict[str, Any]) -> str:
-        return render_to_string("streamfield/_invalid_block.html", {
-            "uuid": block_data["uuid"],
-            "pk": block_data["pk"],
-            "app_label": block_data["app_label"],
-            "model_name": block_data["model_name"],
+        return render_to_string("streamfield/_valid_block.html", context)
+
+    def _block_invalid(self, record: Dict[str, Any]) -> str:
+        context = dict(record, **{
+            "title": _("Invalid block"),
+            "description": f"{record['model']} (Primary key: {record['pk']})"
         })
+        return render_to_string("streamfield/_invalid_block.html", context)
