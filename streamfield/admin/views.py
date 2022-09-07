@@ -1,11 +1,10 @@
 import json
 from json import JSONDecodeError
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Union
 
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.http import HttpResponseBadRequest, JsonResponse
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -67,16 +66,13 @@ class RenderStreamView(PermissionMixin, View):
             return HttpResponseBadRequest()
 
         return JsonResponse({
-            "blocks": self._render_field(stream)
+            "blocks": [
+                self._render_block(block_data)
+                for block_data in stream
+            ]
         })
 
-    def _render_field(self, stream: List) -> str:
-        return "\n".join(
-            self._render_block(block_data)
-            for block_data in stream
-        )
-
-    def _render_block(self, record: Dict[str, Any]) -> str:
+    def _render_block(self, record: Dict[str, Any]) -> Dict[str, Any]:
         try:
             block = blocks.from_dict(record)
         except (LookupError, ObjectDoesNotExist, MultipleObjectsReturned):
@@ -84,25 +80,44 @@ class RenderStreamView(PermissionMixin, View):
         else:
             return self._block_valid(record, block)
 
-    def _block_valid(self, record: Dict[str, Any], block: BlockInstance) -> str:
+    def _block_valid(self, record: Dict[str, Any], block: BlockInstance) -> Dict[str, Any]:
         info = (block._meta.app_label, block._meta.model_name)
 
-        context = dict(record, **{
+        has_change_permission = self.has_change_permission(block)
+        has_view_permission = self.has_view_permission(block)
+
+        return {
+            "status": "valid",
+            "uuid": record["uuid"],
+            "model": record["model"],
+            "pk": record["pk"],
             "title": str(block),
             "description": block._meta.verbose_name,
-            "change_related_url": reverse(
-                "admin:%s_%s_%s" % (info + ("change",)),
-                args=(block.pk,),
-            ),
-            "can_change_related": self.has_change_permission(block),
-            "can_view_related": self.has_view_permission(block),
-        })
+            "change_button": {
+                "show": has_change_permission or has_view_permission,
+                "url": reverse(
+                    "admin:%s_%s_%s" % (info + ("change",)),
+                    args=(block.pk,),
+                ),
+                "title": _("Change block") if has_change_permission else _("View block"),
+                "icon": "fa-pencil" if has_change_permission else "fa-eye",
+            },
+            "delete_button": {
+                "title": _("Delete block"),
+                "icon": "fa-trash"
+            },
+        }
 
-        return render_to_string("streamfield/_valid_block.html", context)
-
-    def _block_invalid(self, record: Dict[str, Any]) -> str:
-        context = dict(record, **{
+    def _block_invalid(self, record: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "status": "invalid",
+            "uuid": record["uuid"],
+            "model": record["model"],
+            "pk": record["pk"],
             "title": _("Invalid block"),
-            "description": f"{record['model']} (Primary key: {record['pk']})"
-        })
-        return render_to_string("streamfield/_invalid_block.html", context)
+            "description": f"{record['model']} (Primary key: {record['pk']})",
+            "delete_button": {
+                "title": _("Delete block"),
+                "icon": "fa-trash"
+            },
+        }

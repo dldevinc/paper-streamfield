@@ -1,4 +1,5 @@
 /* global gettext */
+import Mustache from 'mustache';
 
 import "./widget.scss";
 
@@ -226,8 +227,21 @@ class StreamField {
                 throw `${response.status} ${response.statusText}`;
             }
             return response.json()
-        }).then(data => {
-            this.blocks.innerHTML = data.blocks || "";
+        }).then(response => {
+            const rendered = [];
+            response.blocks.forEach(block => {
+                const status = block.status;
+                const template = this.field.querySelector(`.stream-field__block-template--${status}`);
+                if (!template) {
+                    return
+                }
+
+                rendered.push(
+                    Mustache.render(template.innerHTML, block)
+                )
+            });
+            this.blocks.innerHTML = rendered.join("");
+
             this.status = this.STATUS.READY;
         }).catch(reason => {
             if (reason instanceof Error) {
