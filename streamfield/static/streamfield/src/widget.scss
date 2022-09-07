@@ -5,6 +5,7 @@
   }
 
   &__container {
+    overflow: auto;  // fix toolbar margin-top
     min-height: 50px;
 
     &:after {
@@ -19,6 +20,14 @@
       border-radius: 0.25rem;
       transition: opacity 0.3s;
     }
+  }
+
+  &__blocks {
+
+  }
+
+  &__toolbar {
+    padding-top: 10px;
   }
 
   &__block {

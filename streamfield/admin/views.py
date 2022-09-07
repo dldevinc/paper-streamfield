@@ -43,7 +43,7 @@ class PermissionMixin:
         )
 
 
-class RenderFieldView(PermissionMixin, View):
+class RenderStreamView(PermissionMixin, View):
     """
     Отрисовка поля StreamField в соответствии с переданными JSON-данными.
     """
@@ -67,7 +67,7 @@ class RenderFieldView(PermissionMixin, View):
             return HttpResponseBadRequest()
 
         return JsonResponse({
-            "rendered_field": self._render_field(stream)
+            "blocks": self._render_field(stream)
         })
 
     def _render_field(self, stream: List) -> str:
@@ -82,12 +82,12 @@ class RenderFieldView(PermissionMixin, View):
         except (LookupError, ObjectDoesNotExist, MultipleObjectsReturned):
             return self._block_invalid(record)
         else:
-            return self._block_valid(block)
+            return self._block_valid(record, block)
 
-    def _block_valid(self, block: BlockInstance) -> str:
+    def _block_valid(self, record: Dict[str, Any], block: BlockInstance) -> str:
         info = (block._meta.app_label, block._meta.model_name)
 
-        context = dict(blocks.to_dict(block), **{
+        context = dict(record, **{
             "title": str(block),
             "description": block._meta.verbose_name,
             "change_related_url": reverse(

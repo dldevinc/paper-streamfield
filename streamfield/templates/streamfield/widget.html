@@ -1,5 +1,16 @@
 <div class="stream-field"
-     data-render-url="{% url "streamfields:render" %}">
+     data-render-stream-url="{% url "streamfields:render-stream" %}">
   <textarea name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>{{ widget.value|default:"" }}</textarea>
-  <div class="stream-field__container"></div>
+  <div class="stream-field__container">
+    <div class="stream-field__blocks"></div>
+    <div class="stream-field__toolbar">
+      <button type="button" class="stream-field__add-block-btn btn btn-sm btn-success" disabled>
+        <i class="fa fa-plus"></i> {{ _("Create new block") }}
+      </button>
+
+      <button type="button" class="stream-field__lookup-block-btn btn btn-sm btn-info" disabled>
+        <i class="fa fa-search"></i> {{ _("Lookup block") }}
+      </button>
+    </div>
+  </div>
 </div>

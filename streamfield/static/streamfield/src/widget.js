@@ -17,14 +17,19 @@ class StreamField {
     static CSS = {
         field: "stream-field",
         control: "stream-field__control",
-        container: "stream-field__container",
+        blocks: "stream-field__blocks",
         block: "stream-field__block",
+        sortableHandler: "stream-field__sortable-handler",
+        deleteBlockButton: "stream-field__delete-btn",
+        changeBlockButton: "stream-field__change-btn",
+        addNewBlockButton: "stream-field__add-block-btn",
+        lookupBlockButton: "stream-field__lookup-block-btn",
     };
 
     constructor(element) {
         this.field = element;
-        this.container = this.field.querySelector(`.${this.CSS.container}`);
         this.control = this.field.querySelector(`.${this.CSS.control}`);
+        this.blocks = this.field.querySelector(`.${this.CSS.blocks}`);
 
         this.allowedModels = JSON.parse(this.control.dataset.allowedModels);
         this.blockMap = this.buildBlockMap();
@@ -81,13 +86,18 @@ class StreamField {
         Object.values(this.STATUS).forEach(value => {
             this.field.classList.toggle(`${this.CSS.field}--${value}`, status === value);
         });
+
+        const addNewBlockButton = this.field.querySelector(`.${this.CSS.addNewBlockButton}`);
+        const lookupBlockButton = this.field.querySelector(`.${this.CSS.lookupBlockButton}`);
+        addNewBlockButton && (addNewBlockButton.disabled = !(status === this.STATUS.READY));
+        lookupBlockButton && (lookupBlockButton.disabled = !(status === this.STATUS.READY));
     }
 
     /**
      * @returns {HTMLElement[]}
      */
     getBlocks() {
-        return Array.from(this.container.querySelectorAll(`.${this.CSS.block}`))
+        return Array.from(this.blocks.querySelectorAll(`.${this.CSS.block}`))
     }
 
     destroy() {
@@ -115,9 +125,9 @@ class StreamField {
      * @private
      */
     _initSortable() {
-        return Sortable.create(this.container, {
+        return Sortable.create(this.blocks, {
             animation: 0,
-            draggable: ".stream-field__block",
+            draggable: `.${this.CSS.block}`,
             filter: (event, target) => {
                 if (this.status === this.STATUS.LOADING) {
                     return true;
@@ -127,7 +137,7 @@ class StreamField {
                     return true;
                 }
             },
-            handle: ".stream-field__sortable-handler",
+            handle: `.${this.CSS.sortableHandler}`,
             ghostClass: "sortable-ghost",
             onEnd: () => {
                 this.save();
@@ -137,7 +147,7 @@ class StreamField {
 
     _addListeners() {
         this.field.addEventListener("click", event => {
-            const deleteButton = event.target.closest(".stream-field__delete-btn");
+            const deleteButton = event.target.closest(`.${this.CSS.deleteBlockButton}`);
             if (deleteButton) {
                 event.preventDefault();
                 deleteButton.disabled = true;
@@ -177,7 +187,7 @@ class StreamField {
                 });
             }
 
-            const changeButton = event.target.closest(".stream-field__change-btn");
+            const changeButton = event.target.closest(`.${this.CSS.changeBlockButton}`);
             if (changeButton) {
                 event.preventDefault();
                 const jQueryEvent = $.Event("django:show-related", {href: changeButton.href});
@@ -187,7 +197,7 @@ class StreamField {
                 }
             }
 
-            const addButton = event.target.closest(".stream-field__add-btn");
+            const addButton = event.target.closest(`.${this.CSS.addNewBlockButton}`);
             if (addButton) {
                 event.preventDefault();
                 const jQueryEvent = $.Event("django:show-related", {href: changeButton.href});
@@ -199,14 +209,10 @@ class StreamField {
         });
     }
 
-    render(data) {
+    renderStream(data) {
         this.status = this.STATUS.LOADING;
 
-        if (typeof data !== "string") {
-            data = JSON.stringify(data);
-        }
-
-        const renderUrl = this.field.dataset.renderUrl;
+        const renderUrl = this.field.dataset.renderStreamUrl;
         return fetch(renderUrl, {
             method: "POST",
             mode: "same-origin",
@@ -214,14 +220,14 @@ class StreamField {
             headers: {
                 "Content-Type": "application/json;charset=utf-8"
             },
-            body: data
+            body: JSON.stringify(data)
         }).then(response => {
             if (!response.ok) {
                 throw `${response.status} ${response.statusText}`;
             }
             return response.json()
         }).then(data => {
-            this.container.innerHTML = data.rendered_field || "";
+            this.blocks.innerHTML = data.blocks || "";
             this.status = this.STATUS.READY;
         }).catch(reason => {
             if (reason instanceof Error) {
@@ -241,25 +247,25 @@ class StreamField {
     }
 
     update() {
-        return this.render(this.value);
+        return this.renderStream(this.value);
     }
 }
 
 
 class StreamFieldWidget extends Widget {
     _init(element) {
-        element.__streamFieldInstance = new StreamField(element, this);
+        element._streamField = new StreamField(element, this);
     }
 
     _destroy(element) {
-        if (element.__streamFieldInstance) {
-            element.__streamFieldInstance.destroy();
-            delete element.__streamFieldInstance;
+        if (element._streamField) {
+            element._streamField.destroy();
+            delete element._streamField;
         }
     }
 
     getStreamFieldInstance(element) {
-        return element.__streamFieldInstance;
+        return element._streamField;
     }
 }
 

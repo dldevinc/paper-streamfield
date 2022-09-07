@@ -8,7 +8,8 @@
         case "change":
             opener.dismissChangeStreamBlockPopup(window);
             break;
-        default:
+        case "add":
+            opener.dismissAddStreamBlockPopup(window, initData.value);
             break;
     }
 </script>
