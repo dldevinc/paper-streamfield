@@ -1,18 +1,33 @@
 import json
 
 from django.apps import apps
+from django.core.exceptions import ValidationError
 from django.db.models import Model
 from django.forms import JSONField
+from django.utils.translation import gettext_lazy as _
 
+from .. import blocks
 from .widgets import StreamWidget
 
 
 class StreamField(JSONField):
     widget = StreamWidget
+    default_error_messages = {
+        "invalid-stream": _("Some of the blocks are invalid."),
+    }
 
     def __init__(self, **kwargs):
         self.models = kwargs.pop("models", [])
         super().__init__(**kwargs)
+
+    def validate(self, value):
+        super().validate(value)
+
+        if not all(blocks.is_valid(record) for record in value):
+            raise ValidationError(
+                self.error_messages["invalid-stream"],
+                code="invalid-stream"
+            )
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)

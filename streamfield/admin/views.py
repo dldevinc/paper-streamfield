@@ -61,10 +61,6 @@ class RenderStreamView(PermissionMixin, View):
             logger.warning("Invalid stream type")
             return HttpResponseBadRequest()
 
-        if not all(blocks.is_valid(record) for record in stream):
-            logger.warning("Invalid stream value")
-            return HttpResponseBadRequest()
-
         return JsonResponse({
             "blocks": [
                 self._render_block(block_data)
@@ -73,6 +69,9 @@ class RenderStreamView(PermissionMixin, View):
         })
 
     def _render_block(self, record: Dict[str, Any]) -> Dict[str, Any]:
+        if not blocks.is_valid(record):
+            return self._block_invalid(record)
+
         try:
             block = blocks.from_dict(record)
         except (LookupError, ObjectDoesNotExist, MultipleObjectsReturned):
@@ -109,13 +108,15 @@ class RenderStreamView(PermissionMixin, View):
         }
 
     def _block_invalid(self, record: Dict[str, Any]) -> Dict[str, Any]:
+        model = record.get("model", "undefined")
+        pk = record.get("pk", "undefined")
         return {
             "status": "invalid",
-            "uuid": record["uuid"],
-            "model": record["model"],
-            "pk": record["pk"],
+            "uuid": record.get("uuid", ""),
+            "model": model,
+            "pk": pk,
             "title": _("Invalid block"),
-            "description": f"{record['model']} (Primary key: {record['pk']})",
+            "description": f"{model} (Primary key: {pk})",
             "delete_button": {
                 "title": _("Delete block"),
                 "icon": "fa-trash"

@@ -1,5 +1,6 @@
 /* global gettext */
-import Mustache from 'mustache';
+import Mustache from "mustache";
+import {v4 as uuid4, validate as uuid_validate} from "uuid";
 
 import "./widget.scss";
 
@@ -33,9 +34,9 @@ class StreamField {
         this.blocks = this.field.querySelector(`.${this.CSS.blocks}`);
 
         this.allowedModels = JSON.parse(this.control.dataset.allowedModels);
-        this.blockMap = this.buildBlockMap();
         this._sortable = this._initSortable();
         this._addListeners();
+        this._updateBlockMap();
 
         this.update();
     }
@@ -101,6 +102,14 @@ class StreamField {
         return Array.from(this.blocks.querySelectorAll(`.${this.CSS.block}`))
     }
 
+    /**
+     * @param {string} uuid
+     * @returns {Object}
+     */
+    getBlockByUUID(uuid) {
+        return this._blockMap[uuid];
+    }
+
     destroy() {
         if (this._sortable) {
             this._sortable.destroy();
@@ -111,14 +120,28 @@ class StreamField {
 
     /**
      * Создаёт объект для быстрого поиска блоков по UUID.
+     *
      * @returns {Object}
      */
-    buildBlockMap() {
+    _updateBlockMap() {
+        let hasBadBlocks = false;
         const result = {};
-        for (const record of this.value) {
-            result[record["uuid"]] = record;
+
+        const processedValue = this.value.map(record => {
+            let uuid = record["uuid"];
+            if ((typeof uuid === "string") && uuid_validate(uuid)) {
+                return result[uuid] = record;
+            } else {
+                hasBadBlocks = true;
+                uuid = uuid4();
+                return result[uuid] = {uuid: uuid};
+            }
+        });
+
+        this._blockMap = result;
+        if (processedValue) {
+            this.value = processedValue;
         }
-        return result
     }
 
     /**
@@ -241,7 +264,6 @@ class StreamField {
                 )
             });
             this.blocks.innerHTML = rendered.join("");
-
             this.status = this.STATUS.READY;
         }).catch(reason => {
             if (reason instanceof Error) {
@@ -256,7 +278,7 @@ class StreamField {
     save() {
         this.value = this.getBlocks().map(block => {
             const uuid = block.dataset.uuid;
-            return this.blockMap[uuid];
+            return this.getBlockByUUID(uuid);
         });
     }
 
