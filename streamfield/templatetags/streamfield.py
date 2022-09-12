@@ -15,7 +15,9 @@ register = Library()
 @register.simple_tag(name="render_stream", takes_context=True)
 def do_render_stream(context, stream: str):
     request = context.get("request", None)
-    output = helpers.render_stream(stream, context.flatten(), request=request)
+    output = helpers.render_stream(stream, {
+        "parent_context": context.flatten(),
+    }, request=request)
     return mark_safe(output)
 
 
@@ -44,7 +46,9 @@ if jinja2 is not None:
         @staticmethod
         def _render_stream(stream: str, context):
             request = context.get("request", None)
-            return helpers.render_stream(stream, context, request=request)
+            return helpers.render_stream(stream, {
+                "parent_context": context,
+            }, request=request)
 
 
     # django-jinja support
