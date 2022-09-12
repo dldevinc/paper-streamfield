@@ -8,7 +8,10 @@
         case "change":
             opener.dismissChangeStreamBlockPopup(window);
             break;
-        case "add":
+        case "delete":
+            opener.dismissDeleteStreamBlockPopup(window, initData.value);
+            break;
+        default:
             opener.dismissAddStreamBlockPopup(window, initData.value);
             break;
     }

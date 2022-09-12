@@ -1,16 +1,11 @@
 <div class="stream-field"
-     data-render-stream-url="{% url "streamfields:render-stream" %}">
+     data-render-stream-url="{% url "streamfields:render-stream" %}"
+     data-render-toolbar-url="{% url "streamfields:render-toolbar" %}">
   <textarea name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>{{ widget.value|default:"" }}</textarea>
   <div class="stream-field__container">
     <div class="stream-field__blocks"></div>
     <div class="stream-field__toolbar">
-      <button type="button" class="stream-field__add-block-btn btn btn-sm btn-success" disabled>
-        <i class="fa fa-plus"></i> {{ _("Create new block") }}
-      </button>
 
-      <button type="button" class="stream-field__lookup-block-btn btn btn-sm btn-info" disabled>
-        <i class="fa fa-search"></i> {{ _("Lookup block") }}
-      </button>
     </div>
   </div>
 
@@ -55,7 +50,6 @@
     </div>
   {% endverbatim %}</template>
 
-
   <template class="stream-field__block-template--invalid">{% verbatim %}
     <div class="stream-field__block stream-field__block--invalid" data-uuid="{{ uuid }}">
       <div class="stream-field__sortable-handler">
@@ -80,6 +74,22 @@
           {{ /delete_button }}
         </div>
       </div>
+    </div>
+  {% endverbatim %}</template>
+
+  <template class="stream-field__toolbar-button-template">{% verbatim %}
+    <div class="dropdown d-inline-block {{ dropdownClass }}">
+      <button class="{{ buttonClass }} btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+        <i class="fa {{ icon }}"></i>
+        {{ title }}
+      </button>
+      <ul class="stream-field__dropdown dropdown-menu">
+        {{ #models }}
+        <li role="presentation">
+          <a class="dropdown-item {{ class }}" href="{{ url }}" id="{{ id }}">{{ title }}</a>
+        </li>
+        {{ /models }}
+      </ul>
     </div>
   {% endverbatim %}</template>
 </div>

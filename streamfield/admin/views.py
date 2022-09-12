@@ -2,6 +2,7 @@ import json
 from json import JSONDecodeError
 from typing import Any, Dict, Union
 
+from django.apps import apps
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.http import HttpResponseBadRequest, JsonResponse
@@ -55,11 +56,11 @@ class RenderStreamView(PermissionMixin, View):
             stream = json.loads(request.body)
         except JSONDecodeError:
             logger.warning("Stream is not valid JSON")
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest("Stream is not valid JSON")
 
         if not isinstance(stream, list):
             logger.warning("Invalid stream type")
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest("Invalid stream type")
 
         return JsonResponse({
             "blocks": [
@@ -122,3 +123,76 @@ class RenderStreamView(PermissionMixin, View):
                 "icon": "fa-trash"
             },
         }
+
+
+class RenderToolbarView(PermissionMixin, View):
+    """
+    Проверка прав на переданные модели для отрисовки кнопок StreamField.
+    """
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+        except JSONDecodeError:
+            logger.warning("Request is not valid JSON")
+            return HttpResponseBadRequest()
+
+        try:
+            models = data["models"]
+            field_id = data["field_id"]
+        except KeyError:
+            logger.warning("Invalid request body")
+            return HttpResponseBadRequest("Invalid request body")
+
+        if not isinstance(models, list):
+            logger.warning("Invalid request body")
+            return HttpResponseBadRequest("Invalid request body")
+
+        if not all(isinstance(item, str) for item in models):
+            logger.warning("Invalid request body")
+            return HttpResponseBadRequest("Invalid request body")
+
+        create_models = []
+        lookup_models = []
+        buttons = [{
+            "title": _("Create new block"),
+            "buttonClass": "btn-success",
+            "icon": "fa-plus",
+            "models": create_models,
+        }, {
+            "title": _("Lookup block"),
+            "buttonClass": "btn-info",
+            "icon": "fa-search",
+            "models": lookup_models,
+        }]
+
+        for model_name in models:
+            try:
+                model = apps.get_model(model_name)  # type: BlockModel
+            except LookupError:
+                continue
+
+            info = (model._meta.app_label, model._meta.model_name)
+
+            if self.has_add_permission(model):
+                create_models.append({
+                    "id": "add_%s--%s.%s" % (field_id, info[0], info[1]),
+                    "title": model._meta.verbose_name,
+                    "class": "stream-field__create-block-btn",
+                    "url": reverse("admin:%s_%s_add" % info),
+                })
+
+            if self.has_change_permission(model) or self.has_view_permission(model):
+                lookup_models.append({
+                    "id": "lookup_%s--%s.%s" % (field_id, info[0], info[1]),
+                    "title": model._meta.verbose_name,
+                    "class": "stream-field__lookup-block-btn",
+                    "url": reverse("admin:%s_%s_changelist" % info),
+                })
+
+        return JsonResponse({
+            "buttons": buttons
+        })

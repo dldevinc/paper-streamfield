@@ -21,24 +21,28 @@ class StreamField {
         control: "stream-field__control",
         blocks: "stream-field__blocks",
         block: "stream-field__block",
+        toolbar: "stream-field__toolbar",
         sortableHandler: "stream-field__sortable-handler",
-        deleteBlockButton: "stream-field__delete-btn",
-        changeBlockButton: "stream-field__change-btn",
-        addNewBlockButton: "stream-field__add-block-btn",
+        createBlockButton: "stream-field__create-block-btn",
         lookupBlockButton: "stream-field__lookup-block-btn",
+        changeBlockButton: "stream-field__change-btn",
+        deleteBlockButton: "stream-field__delete-btn",
     };
 
     constructor(element) {
         this.field = element;
         this.control = this.field.querySelector(`.${this.CSS.control}`);
         this.blocks = this.field.querySelector(`.${this.CSS.blocks}`);
+        this.toolbar = this.field.querySelector(`.${this.CSS.toolbar}`);
 
-        this.allowedModels = JSON.parse(this.control.dataset.allowedModels);
         this._sortable = this._initSortable();
         this._addListeners();
         this._updateBlockMap();
 
-        this.update();
+        this.wrapPreloader(Promise.all([
+            this.update(),
+            this.updateToolbar(),
+        ]))
     }
 
     get STATUS() {
@@ -88,11 +92,13 @@ class StreamField {
         Object.values(this.STATUS).forEach(value => {
             this.field.classList.toggle(`${this.CSS.field}--${value}`, status === value);
         });
+    }
 
-        const addNewBlockButton = this.field.querySelector(`.${this.CSS.addNewBlockButton}`);
-        const lookupBlockButton = this.field.querySelector(`.${this.CSS.lookupBlockButton}`);
-        addNewBlockButton && (addNewBlockButton.disabled = !(status === this.STATUS.READY));
-        lookupBlockButton && (lookupBlockButton.disabled = !(status === this.STATUS.READY));
+    /**
+     * @returns {String[]}
+     */
+    get allowedModels() {
+        return JSON.parse(this.control.dataset.allowedModels);
     }
 
     /**
@@ -115,7 +121,7 @@ class StreamField {
             this._sortable.destroy();
         }
 
-        // TODO
+        // TODO: remove event listeners
     }
 
     /**
@@ -197,8 +203,11 @@ class StreamField {
 
                                 const block = deleteButton.closest(`.${this.CSS.block}`);
                                 block.remove();
+
                                 this.save();
-                                this.update();
+                                this.wrapPreloader(
+                                    this.update()
+                                );
                             }
                         }
                     ],
@@ -221,21 +230,68 @@ class StreamField {
                 }
             }
 
-            const addButton = event.target.closest(`.${this.CSS.addNewBlockButton}`);
-            if (addButton) {
+            const lookupBlockButton = event.target.closest(`.${this.CSS.lookupBlockButton}`);
+            if (lookupBlockButton) {
                 event.preventDefault();
-                const jQueryEvent = $.Event("django:show-related", {href: changeButton.href});
-                $(addButton).trigger(jQueryEvent);
+                const jQueryEvent = $.Event("django:show-related", {href: lookupBlockButton.href});
+                $(lookupBlockButton).trigger(jQueryEvent);
                 if (!jQueryEvent.isDefaultPrevented()) {
-                    showStreamBlockPopup(addButton);
+                    showStreamBlockPopup(lookupBlockButton);
+                }
+            }
+
+            const createBlockButton = event.target.closest(`.${this.CSS.createBlockButton}`);
+            if (createBlockButton) {
+                event.preventDefault();
+                const jQueryEvent = $.Event("django:show-related", {href: createBlockButton.href});
+                $(createBlockButton).trigger(jQueryEvent);
+                if (!jQueryEvent.isDefaultPrevented()) {
+                    showStreamBlockPopup(createBlockButton);
                 }
             }
         });
     }
 
-    renderStream(data) {
-        this.status = this.STATUS.LOADING;
+    /**
+     * @param {Object} block
+     * @private
+     */
+    _appendBlock(block) {
+        const uuid = block.uuid;
+        if (!uuid_validate(uuid)) {
+            throw new Error("Invalid UUID");
+        }
 
+        const newValue = this.value;
+        newValue.push(block);
+        this.value = newValue;
+
+        this._blockMap[uuid] = block;
+    }
+
+    save() {
+        this.value = this.getBlocks().map(block => {
+            const uuid = block.dataset.uuid;
+            return this.getBlockByUUID(uuid);
+        });
+    }
+
+    update() {
+        return this.renderStream(this.value);
+    }
+
+    /**
+     * @param {Promise} promise
+     * @returns {Promise}
+     */
+    wrapPreloader(promise) {
+        this.status = this.STATUS.LOADING;
+        return promise.finally(() => {
+            this.status = this.STATUS.READY;
+        })
+    }
+
+    renderStream(data) {
         const renderUrl = this.field.dataset.renderStreamUrl;
         return fetch(renderUrl, {
             method: "POST",
@@ -264,26 +320,52 @@ class StreamField {
                 )
             });
             this.blocks.innerHTML = rendered.join("");
-            this.status = this.STATUS.READY;
         }).catch(reason => {
             if (reason instanceof Error) {
                 // JS-ошибки дублируем в консоль
                 console.error(reason);
             }
             modals.showErrors(reason);
-            this.status = this.STATUS.READY;
         });
     }
 
-    save() {
-        this.value = this.getBlocks().map(block => {
-            const uuid = block.dataset.uuid;
-            return this.getBlockByUUID(uuid);
+    renderToolbar(data) {
+        const renderUrl = this.field.dataset.renderToolbarUrl;
+        return fetch(renderUrl, {
+            method: "POST",
+            mode: "same-origin",
+            cache: "no-store",
+            headers: {
+                "Content-Type": "application/json;charset=utf-8"
+            },
+            body: JSON.stringify(data)
+        }).then(response => {
+            if (!response.ok) {
+                throw `${response.status} ${response.statusText}`;
+            }
+            return response.json()
+        }).then(response => {
+            const template = this.field.querySelector(".stream-field__toolbar-button-template");
+            if (!template) {
+                return
+            }
+
+            const rendered = [];
+            response.buttons.forEach(button => {
+                rendered.push(
+                    Mustache.render(template.innerHTML, button)
+                )
+            });
+
+            this.toolbar.innerHTML = rendered.join("");
         });
     }
 
-    update() {
-        return this.renderStream(this.value);
+    updateToolbar() {
+        return this.renderToolbar({
+            "field_id": this.control.id,
+            "models": this.allowedModels
+        });
     }
 }
 
@@ -315,9 +397,39 @@ widget.initAll(".stream-field");
  * @param {HTMLElement} triggeringLink
  */
 function showStreamBlockPopup(triggeringLink) {
-    return popupUtils.showAdminPopup(triggeringLink, /^(change|add|delete)_/, true);
+    return popupUtils.showAdminPopup(triggeringLink, /^(change|add|lookup)_/, true);
 }
 
+/**
+ * @param {Window} win
+ * @param {String} newId
+ */
+function dismissAddStreamBlockPopup(win, newId) {
+    const name = popupUtils.removePopupIndex(win.name);
+    const match = /^(.+)--(.+)\.(.+)$/.exec(name);
+    if (match) {
+        const control = document.getElementById(match[1]);
+        const field = control.closest(".stream-field");
+        const streamField = field && widget.getStreamFieldInstance(field);
+
+        streamField._appendBlock({
+            "uuid": uuid4(),
+            "model": `${match[2]}.${match[3]}`,
+            "pk": newId,
+        });
+
+        streamField.wrapPreloader(
+            streamField.update()
+        );
+
+        popupUtils.removeRelatedWindow(win);
+        win.close();
+    }
+}
+
+/**
+ * @param {Window} win
+ */
 function dismissChangeStreamBlockPopup(win) {
     const name = "change_" + popupUtils.removePopupIndex(win.name);
     const element = document.getElementById(name);
@@ -331,4 +443,61 @@ function dismissChangeStreamBlockPopup(win) {
     win.close();
 }
 
+/**
+ * @param {Window} win
+ * @param {String} objId
+ */
+function dismissDeleteStreamBlockPopup(win, objId) {
+    const name = popupUtils.removePopupIndex(win.name);
+    const match = /^(.+)--(.+)\.(.+)$/.exec(name);
+    if (match) {
+        const control = document.getElementById(match[1]);
+        const field = control.closest(".stream-field");
+        const streamField = field && widget.getStreamFieldInstance(field);
+
+        streamField.wrapPreloader(
+            streamField.update()
+        );
+
+        popupUtils.removeRelatedWindow(win);
+        win.close();
+    }
+}
+
+/**
+ * Обёртка над Django-обработчиком `window.dismissRelatedLookupPopup`.
+ * @param {Function} originalFunc
+ */
+function dismissLookupStreamBlockPopup(originalFunc) {
+    return (win, chosenId) => {
+        const name = popupUtils.removePopupIndex(win.name);
+        const match = /^(.+)--(.+)\.(.+)$/.exec(name);
+        if (match) {
+            const control = document.getElementById(match[1]);
+            const field = control.closest(".stream-field");
+            const streamField = field && widget.getStreamFieldInstance(field);
+
+            streamField._appendBlock({
+                "uuid": uuid4(),
+                "model": `${match[2]}.${match[3]}`,
+                "pk": chosenId,
+            });
+
+            streamField.wrapPreloader(
+                streamField.update()
+            );
+
+            popupUtils.removeRelatedWindow(win);
+            win.close();
+        } else {
+            originalFunc(win, chosenId);
+        }
+    }
+}
+
+window.dismissAddStreamBlockPopup = dismissAddStreamBlockPopup;
 window.dismissChangeStreamBlockPopup = dismissChangeStreamBlockPopup;
+window.dismissDeleteStreamBlockPopup = dismissDeleteStreamBlockPopup;
+
+// Wrap default `dismissRelatedLookupPopup`.
+window.dismissRelatedLookupPopup = dismissLookupStreamBlockPopup(window.dismissRelatedLookupPopup);
