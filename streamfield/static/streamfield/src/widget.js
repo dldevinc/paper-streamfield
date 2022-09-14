@@ -413,9 +413,9 @@ function dismissAddStreamBlockPopup(win, newId) {
         const streamField = field && widget.getStreamFieldInstance(field);
 
         streamField._appendBlock({
-            "uuid": uuid4(),
             "model": `${match[2]}.${match[3]}`,
             "pk": newId,
+            "uuid": uuid4(),
         });
 
         streamField.wrapPreloader(
@@ -478,9 +478,9 @@ function dismissLookupStreamBlockPopup(originalFunc) {
             const streamField = field && widget.getStreamFieldInstance(field);
 
             streamField._appendBlock({
-                "uuid": uuid4(),
                 "model": `${match[2]}.${match[3]}`,
                 "pk": chosenId,
+                "uuid": uuid4(),
             });
 
             streamField.wrapPreloader(

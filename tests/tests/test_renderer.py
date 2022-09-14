@@ -3,7 +3,6 @@ from unittest.mock import Mock
 
 import pytest
 from blocks.models import HeaderBlock
-from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
 from django.template import TemplateDoesNotExist
 
@@ -34,13 +33,15 @@ def test_render_template():
     assert render_template(instance) == "<h1>Example header</h1>"
 
 
-def test_render_undefined_template():
-    with pytest.raises(ImproperlyConfigured):
+def test_render_non_existent_template():
+    with pytest.raises(TemplateDoesNotExist, match="blocks/quoteblock.html, blocks/quote_block.html"):
         assert render_template(Mock(
-            spec=["text", "_meta"],
+            spec=["text", "_meta", "__class__"],
+            __class__=Mock(
+                __name__="QuoteBlock"
+            ),
             _meta=Mock(
                 app_label="blocks",
-                model_name="headerblock",
             ),
             text="Example header"
         ))

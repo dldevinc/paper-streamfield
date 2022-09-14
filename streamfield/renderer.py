@@ -1,10 +1,10 @@
 from typing import Dict
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIRequest
 from django.template.loader import get_template, select_template
 
 from .typing import BlockInstance
+from .utils import camel_case_to_snake_case
 
 
 def resolve_template(name, using=None):
@@ -19,9 +19,10 @@ def resolve_template(name, using=None):
 def render_template(block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None) -> str:
     block_template = getattr(block, "block_template", None)
     if block_template is None:
-        raise ImproperlyConfigured(
-            "Model class '%s.%s' requires attribute 'block_template'."
-            % (block._meta.app_label, block._meta.model_name)
+        app_label, model_name = block._meta.app_label, block.__class__.__name__
+        block_template = (
+            "%s/%s.html" % (app_label, model_name.lower()),
+            "%s/%s.html" % (app_label, camel_case_to_snake_case(model_name)),
         )
 
     template_engine = getattr(block, "block_template_engine", None)
