@@ -5,9 +5,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class HeaderBlock(models.Model):
-    text = models.CharField(
-        _("text"),
-        max_length=255
+    text = models.TextField(
+        _("text")
     )
     rank = models.PositiveSmallIntegerField(
         _("rank"),
@@ -23,7 +22,6 @@ class HeaderBlock(models.Model):
 
     class Meta:
         verbose_name = "Header"
-        verbose_name_plural = "Headers"
 
     def __str__(self):
         return self.text
@@ -36,7 +34,6 @@ class TextBlock(models.Model):
 
     class Meta:
         verbose_name = "Text"
-        verbose_name_plural = "Text"
 
     def __str__(self):
         return Truncator(self.text).chars(64)
@@ -59,7 +56,6 @@ class ImageBlock(models.Model):
 
     class Meta:
         verbose_name = "Image"
-        verbose_name_plural = "Images"
 
     def __str__(self):
         return self.title or "Image #{}".format(self.pk)
@@ -76,7 +72,6 @@ class QuoteBlock(models.Model):
 
     class Meta:
         verbose_name = "Quote"
-        verbose_name_plural = "Quotes"
 
     def __str__(self):
         return Truncator(self.text).chars(64)
