@@ -56,7 +56,7 @@ def render(block: BlockInstance, extra_context: Dict = None, request: WSGIReques
     """
     Отрисовка экземпляра блока.
     """
-    renderer = getattr(block, "block_renderer", conf.DEFAULT_BLOCK_RENDERER)
+    renderer = getattr(block, "block_renderer", conf.DEFAULT_RENDERER)
     if isinstance(renderer, str):
         renderer_name = renderer
         renderer = import_string(renderer_name)
