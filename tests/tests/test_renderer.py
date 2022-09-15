@@ -12,15 +12,15 @@ DummyModel = Mock(spec=[])  # type: Union[Mock, Type[Model]]
 
 
 def test_resolve_template_with_string():
-    template = resolve_template("blocks/header.html")
-    assert template.template.name == "blocks/header.html"
+    template = resolve_template("blocks/header_block.html")
+    assert template.template.name == "blocks/header_block.html"
 
 
 def test_resolve_template_with_tuple():
     template = resolve_template(
-        ("blocks/missing.html", "blocks/header.html")
+        ("blocks/missing.html", "blocks/header_block.html")
     )
-    assert template.template.name == "blocks/header.html"
+    assert template.template.name == "blocks/header_block.html"
 
 
 def test_resolve_template_fail():
