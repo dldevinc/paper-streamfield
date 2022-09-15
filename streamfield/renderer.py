@@ -3,6 +3,7 @@ from typing import Dict
 from django.core.handlers.wsgi import WSGIRequest
 from django.template.loader import get_template, select_template
 
+from . import conf
 from .typing import BlockInstance
 from .utils import camel_case_to_snake_case
 
@@ -25,7 +26,7 @@ def render_template(block: BlockInstance, extra_context: Dict = None, request: W
             "%s/%s.html" % (app_label, camel_case_to_snake_case(model_name)),
         )
 
-    template_engine = getattr(block, "block_template_engine", None)
+    template_engine = getattr(block, "block_template_engine", conf.DEFAULT_TEMPLATE_ENGINE)
     template = resolve_template(block_template, using=template_engine)
 
     context = {
