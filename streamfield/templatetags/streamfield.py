@@ -1,5 +1,6 @@
 from django.template.library import Library
 from django.utils.safestring import mark_safe
+from jinja2_simple_tags import StandaloneTag
 
 from .. import helpers
 
@@ -13,42 +14,27 @@ register = Library()
 
 
 @register.simple_tag(name="render_stream", takes_context=True)
-def do_render_stream(context, stream: str):
+def do_render_stream(context, stream: str, **kwargs):
     request = context.get("request", None)
-    output = helpers.render_stream(stream, {
+    context = {
         "parent_context": context.flatten(),
-    }, request=request)
+    }
+    context.update(kwargs)
+    output = helpers.render_stream(stream, context, request=request)
     return mark_safe(output)
 
 
 if jinja2 is not None:
-    from jinja2 import nodes
-    from jinja2.ext import Extension
-
-
-    class StreamFieldExtension(Extension):
+    class StreamFieldExtension(StandaloneTag):
         tags = {"render_stream"}
 
-        def parse(self, parser):
-            lineno = next(parser.stream).lineno
-            kwargs = [
-                nodes.Keyword("context", nodes.ContextReference())
-            ]
-
-            args = []
-            while parser.stream.current.type != 'block_end':
-                args.append(parser.parse_expression())
-
-            block_call = self.call_method("_render_stream", args, kwargs=kwargs)
-            call = nodes.MarkSafe(block_call, lineno=lineno)
-            return nodes.Output([call], lineno=lineno)
-
-        @staticmethod
-        def _render_stream(stream: str, context):
-            request = context.get("request", None)
-            return helpers.render_stream(stream, {
-                "parent_context": context,
-            }, request=request)
+        def render(self, stream: str, **kwargs):
+            request = self.context.get("request", None)
+            context = {
+                "parent_context": self.context,
+            }
+            context.update(kwargs)
+            return helpers.render_stream(stream, context, request=request)
 
 
     # django-jinja support
