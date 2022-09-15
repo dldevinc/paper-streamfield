@@ -7,7 +7,7 @@ from .models import Page
 class PageAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            "fields": ["header", "slug", "text"]
+            "fields": ["header", "slug"]
         }),
         (None, {
             "fields": ["stream"]

@@ -13,10 +13,6 @@ class Page(models.Model):
     slug = models.SlugField(
         _("slug"),
     )
-    text = models.TextField(
-        _("text"),
-        blank=True
-    )
     stream = StreamField(_("stream"), models=[
         "blocks.HeaderBlock",
         "blocks.ImageBlock",
