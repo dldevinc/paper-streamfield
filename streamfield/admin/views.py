@@ -5,6 +5,7 @@ from typing import Any, Dict, Union
 from django.apps import apps
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.forms import model_to_dict
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -92,17 +93,19 @@ class RenderStreamView(PermissionMixin, View):
             "model": record["model"],
             "pk": record["pk"],
             "title": str(block),
-            "description": block._meta.verbose_name,
+            "verbose_name": block._meta.verbose_name,
+            "data": model_to_dict(block),
             "change_button": {
                 "show": has_change_permission or has_view_permission,
+                "title": _("Change block") if has_change_permission else _("View block"),
+                "icon": "fa-pencil" if has_change_permission else "fa-eye",
                 "url": reverse(
                     "admin:%s_%s_%s" % (info + ("change",)),
                     args=(block.pk,),
                 ),
-                "title": _("Change block") if has_change_permission else _("View block"),
-                "icon": "fa-pencil" if has_change_permission else "fa-eye",
             },
             "delete_button": {
+                "show": True,
                 "title": _("Delete block"),
                 "icon": "fa-trash"
             },
@@ -117,8 +120,8 @@ class RenderStreamView(PermissionMixin, View):
             "model": model,
             "pk": pk,
             "title": _("Invalid block"),
-            "description": f"{model} (Primary key: {pk})",
             "delete_button": {
+                "show": True,
                 "title": _("Delete block"),
                 "icon": "fa-trash"
             },

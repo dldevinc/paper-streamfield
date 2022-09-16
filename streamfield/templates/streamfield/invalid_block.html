@@ -7,19 +7,22 @@
     <div class="stream-field__title stream-field__title--invalid">
       {{ title }}
       <br>
-      <small class="text-muted">{{ description }}</small>
+      <small class="text-muted">{{ model }} (Primary key: {{ pk }})</small>
     </div>
 
     <div class="stream-field__tools">
       <div class="btn-square-group">
-        {{ #delete_button }}
+        {{ #delete_button.show }}
         <button type="button"
                 class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
-                data-toggle="tooltip" data-placement="top" data-trigger="hover"
-                data-html="true" title="{{ delete_button.title }}">
+                data-toggle="tooltip"
+                data-placement="top"
+                data-trigger="hover"
+                data-html="true"
+                title="{{ delete_button.title }}">
           <i class="fa {{ delete_button.icon }}"></i>
         </button>
-        {{ /delete_button }}
+        {{ /delete_button.show }}
       </div>
     </div>
   </div>
