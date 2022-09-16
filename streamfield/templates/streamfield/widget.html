@@ -4,92 +4,10 @@
   <textarea name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>{{ widget.value|default:"" }}</textarea>
   <div class="stream-field__container">
     <div class="stream-field__blocks"></div>
-    <div class="stream-field__toolbar">
-
-    </div>
+    <div class="stream-field__toolbar"></div>
   </div>
 
-
-  <template class="stream-field__block-template--valid">{% verbatim %}
-    <div class="stream-field__block" data-uuid="{{ uuid }}">
-      <div class="stream-field__sortable-handler">
-        <div class="stream-field__sortable-icon"></div>
-      </div>
-
-      <div class="stream-field__title">
-        {{ title }}
-        <br>
-        <small class="text-muted">{{ description }}</small>
-      </div>
-
-      <div class="stream-field__tools">
-        <div class="btn-square-group">
-          {{ #change_button.show }}
-            <a href="{{ change_button.url }}"
-               id="change_uuid_{{ uuid }}"
-               class="stream-field__change-btn btn btn-square btn-sm btn-square--info"
-               data-toggle="tooltip"
-               data-placement="top"
-               data-trigger="hover"
-               data-html="true"
-               title="{{ change_button.title }}">
-              <i class="fa {{ change_button.icon }}"></i>
-            </a>
-          {{ /change_button.show }}
-
-          {{ #delete_button }}
-          <button type="button"
-                  class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
-                  data-toggle="tooltip" data-placement="top" data-trigger="hover"
-                  data-html="true" title="{{ delete_button.title }}">
-            <i class="fa {{ delete_button.icon }}"></i>
-          </button>
-          {{ /delete_button }}
-        </div>
-      </div>
-    </div>
-  {% endverbatim %}</template>
-
-  <template class="stream-field__block-template--invalid">{% verbatim %}
-    <div class="stream-field__block stream-field__block--invalid" data-uuid="{{ uuid }}">
-      <div class="stream-field__sortable-handler">
-        <div class="stream-field__sortable-icon"></div>
-      </div>
-
-      <div class="stream-field__title stream-field__title--invalid">
-        {{ title }}
-        <br>
-        <small class="text-muted">{{ description }}</small>
-      </div>
-
-      <div class="stream-field__tools">
-        <div class="btn-square-group">
-          {{ #delete_button }}
-          <button type="button"
-                  class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
-                  data-toggle="tooltip" data-placement="top" data-trigger="hover"
-                  data-html="true" title="{{ delete_button.title }}">
-            <i class="fa {{ delete_button.icon }}"></i>
-          </button>
-          {{ /delete_button }}
-        </div>
-      </div>
-    </div>
-  {% endverbatim %}</template>
-
-  <template class="stream-field__toolbar-button-template">{% verbatim %}
-    <div class="dropdown d-inline-block {{ dropdownClass }}">
-      <button class="{{ buttonClass }} btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-        <i class="fa {{ icon }}"></i>
-        {{ title }}
-      </button>
-      <ul class="stream-field__dropdown dropdown-menu">
-        {{ #models }}
-        <li role="presentation">
-          <a class="dropdown-item {{ class }}" href="{{ url }}" id="{{ id }}">{{ title }}</a>
-        </li>
-        {{ /models }}
-      </ul>
-    </div>
-  {% endverbatim %}</template>
+  {% include "streamfield/valid_block.html" %}
+  {% include "streamfield/invalid_block.html" %}
+  {% include "streamfield/toolbar.html" %}
 </div>

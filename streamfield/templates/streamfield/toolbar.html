@@ -1,0 +1,15 @@
+{% verbatim %}<template class="stream-field__toolbar-button-template">
+  <div class="dropdown d-inline-block {{ dropdownClass }}">
+    <button class="{{ buttonClass }} btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+      <i class="fa {{ icon }}"></i>
+      {{ title }}
+    </button>
+    <ul class="stream-field__dropdown dropdown-menu">
+      {{ #models }}
+      <li role="presentation">
+        <a class="dropdown-item {{ class }}" href="{{ url }}" id="{{ id }}">{{ title }}</a>
+      </li>
+      {{ /models }}
+    </ul>
+  </div>
+</template>{% endverbatim %}
