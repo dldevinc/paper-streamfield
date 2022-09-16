@@ -3,12 +3,8 @@ import json
 from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.db.models import Model
+from django.forms import JSONField
 from django.utils.translation import gettext_lazy as _
-
-try:
-    from django.forms import JSONField
-except ImportError:
-    from django.contrib.postgres.forms import JSONField
 
 from .. import blocks
 from .widgets import StreamWidget
