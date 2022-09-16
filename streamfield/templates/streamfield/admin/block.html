@@ -1,18 +1,18 @@
-<div class="stream-field__block" data-uuid="{{ uuid }}">
+<div class="{% block classes %}stream-field__block{% endblock classes %}" data-uuid="{{ uuid }}">
   <div class="stream-field__sortable-handler">
     <div class="stream-field__sortable-icon"></div>
   </div>
 
-  {% block content %}
-    <div class="stream-field__title">
+  <div class="stream-field__content">
+    {% block content %}
       {{ title }}
       <br>
       <small class="text-muted">{{ verbose_name }}</small>
-    </div>
-  {% endblock content %}
+    {% endblock content %}
+  </div>
 
-  {% block tools %}
-    <div class="stream-field__tools">
+  <div class="stream-field__block-tools">
+    {% block tools %}
       <div class="btn-square-group">
         {% if change_button.show %}
           <a href="{{ change_button.url }}"
@@ -37,6 +37,6 @@
           <i class="fa {{ delete_button.icon }}"></i>
         </button>
       </div>
-    </div>
-  {% endblock %}
+    {% endblock %}
+  </div>
 </div>

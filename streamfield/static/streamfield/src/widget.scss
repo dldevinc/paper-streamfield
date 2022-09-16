@@ -26,6 +26,11 @@
 
   }
 
+
+  // ============
+  //   Block
+  // ============
+
   &__block {
     display: flex;
     padding: 5px 5px 5px 0;
@@ -36,19 +41,16 @@
       margin-top: 10px;
     }
 
-    &.sortable-ghost {
-      opacity: 0.75;
-      background-color: #feffd7;
-    }
-
     &--invalid {
+      color: #d04010;
       border-color: #e78b8b;
     }
-
-    &--removing {
-
-    }
   }
+
+
+  // ============
+  //   Sortable
+  // ============
 
   &__sortable-handler {
     padding: 3px 0;
@@ -63,19 +65,30 @@
     background-size: contain;
   }
 
-  &__title {
-    margin-left: 6px;
-
-    &--invalid {
-      color: #d04010;
-    }
+  &__block.sortable-ghost {
+    opacity: 0.75;
+    background-color: #feffd7;
   }
 
-  &__tools {
+
+  // ============
+  //   Content
+  // ============
+
+  &__content {
+    margin-left: 6px;
+  }
+
+  &__block-tools {
     margin-left: auto;
     padding-left: 5px;
     flex: 0 0 auto;
   }
+
+
+  // ============
+  //   Toolbar
+  // ============
 
   &__toolbar {
     margin-top: 2px;
@@ -107,6 +120,10 @@
     }
   }
 
+
+  // ============
+  //   States
+  // ============
 
   &--loading &__container {
     position: relative;

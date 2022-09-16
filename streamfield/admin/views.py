@@ -92,6 +92,7 @@ class RenderStreamView(PermissionMixin, View):
             "uuid": record["uuid"],
             "model": record["model"],
             "pk": record["pk"],
+            "instance": block,
             "title": str(block),
             "verbose_name": block._meta.verbose_name,
             "change_button": {

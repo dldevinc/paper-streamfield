@@ -1,31 +1,26 @@
+{% extends "streamfield/admin/block.html" %}
+
 {% load i18n %}
 
-<div class="stream-field__block stream-field__block--invalid" data-uuid="{{ uuid }}">
-  <div class="stream-field__sortable-handler">
-    <div class="stream-field__sortable-icon"></div>
+
+{% block classes %}stream-field__block stream-field__block--invalid{% endblock classes %}
+
+{% block content %}
+  {{ title }}
+  <br>
+  <small class="text-muted">{{ model }} ({% trans "Primary key" %}: {{ pk }})</small>
+{% endblock content %}
+
+{% block tools %}
+  <div class="btn-square-group">
+    <button type="button"
+            class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-trigger="hover"
+            data-html="true"
+            title="{{ delete_button.title }}">
+      <i class="fa {{ delete_button.icon }}"></i>
+    </button>
   </div>
-
-  {% block content %}
-    <div class="stream-field__title stream-field__title--invalid">
-      {{ title }}
-      <br>
-      <small class="text-muted">{{ model }} ({% trans "Primary key" %}: {{ pk }})</small>
-    </div>
-  {% endblock content %}
-
-  {% block tools %}
-    <div class="stream-field__tools">
-      <div class="btn-square-group">
-        <button type="button"
-                class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
-                data-toggle="tooltip"
-                data-placement="top"
-                data-trigger="hover"
-                data-html="true"
-                title="{{ delete_button.title }}">
-          <i class="fa {{ delete_button.icon }}"></i>
-        </button>
-      </div>
-    </div>
-  {% endblock tools %}
-</div>
+{% endblock %}
