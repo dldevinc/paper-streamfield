@@ -21,7 +21,6 @@
     "fast-css-loader": "^1.0.2",
     "fibers": "^5.0.3",
     "mini-css-extract-plugin": "^2.6.1",
-    "mustache": "^4.2.0",
     "pixrem": "^5.0.0",
     "postcss": "^8.4.16",
     "postcss-loader": "^7.0.1",

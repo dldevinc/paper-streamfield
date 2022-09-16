@@ -7,12 +7,13 @@ from django.contrib.auth import get_permission_codename
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.forms import model_to_dict
 from django.http import HttpResponseBadRequest, JsonResponse
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from .. import blocks
+from .. import blocks, conf
 from ..logging import logger
 from ..typing import BlockInstance, BlockModel
 
@@ -64,37 +65,35 @@ class RenderStreamView(PermissionMixin, View):
             return HttpResponseBadRequest("Invalid stream type")
 
         return JsonResponse({
-            "blocks": [
-                self._render_block(block_data)
+            "blocks": "".join(
+                self.render_block(block_data)
                 for block_data in stream
-            ]
+            )
         })
 
-    def _render_block(self, record: Dict[str, Any]) -> Dict[str, Any]:
+    def render_block(self, record: Dict[str, Any]) -> str:
         if not blocks.is_valid(record):
-            return self._block_invalid(record)
+            return self.block_invalid(record)
 
         try:
             block = blocks.from_dict(record)
         except (LookupError, ObjectDoesNotExist, MultipleObjectsReturned):
-            return self._block_invalid(record)
+            return self.block_invalid(record)
         else:
-            return self._block_valid(record, block)
+            return self.block_valid(record, block)
 
-    def _block_valid(self, record: Dict[str, Any], block: BlockInstance) -> Dict[str, Any]:
+    def block_valid(self, record: Dict[str, Any], block: BlockInstance) -> str:
         info = (block._meta.app_label, block._meta.model_name)
-
         has_change_permission = self.has_change_permission(block)
         has_view_permission = self.has_view_permission(block)
 
-        return {
-            "status": "valid",
+        admin_template = getattr(block, "admin_block_template", conf.DEFAULT_ADMIN_BLOCK_TEMPLATE)
+        return render_to_string(admin_template, {
             "uuid": record["uuid"],
             "model": record["model"],
             "pk": record["pk"],
             "title": str(block),
             "verbose_name": block._meta.verbose_name,
-            "data": model_to_dict(block),
             "change_button": {
                 "show": has_change_permission or has_view_permission,
                 "title": _("Change block") if has_change_permission else _("View block"),
@@ -105,27 +104,24 @@ class RenderStreamView(PermissionMixin, View):
                 ),
             },
             "delete_button": {
-                "show": True,
                 "title": _("Delete block"),
                 "icon": "fa-trash"
             },
-        }
+        }, request=self.request)
 
-    def _block_invalid(self, record: Dict[str, Any]) -> Dict[str, Any]:
+    def block_invalid(self, record: Dict[str, Any]) -> str:
         model = record.get("model", "undefined")
         pk = record.get("pk", "undefined")
-        return {
-            "status": "invalid",
+        return render_to_string("streamfield/admin/invalid_block.html", {
             "uuid": record.get("uuid", ""),
             "model": model,
             "pk": pk,
             "title": _("Invalid block"),
             "delete_button": {
-                "show": True,
                 "title": _("Delete block"),
                 "icon": "fa-trash"
             },
-        }
+        }, request=self.request)
 
 
 class RenderToolbarView(PermissionMixin, View):
@@ -158,19 +154,8 @@ class RenderToolbarView(PermissionMixin, View):
             logger.warning("Invalid request body")
             return HttpResponseBadRequest("Invalid request body")
 
-        create_models = []
-        lookup_models = []
-        buttons = [{
-            "title": _("Create new block"),
-            "buttonClass": "btn-success",
-            "icon": "fa-plus",
-            "models": create_models,
-        }, {
-            "title": _("Lookup block"),
-            "buttonClass": "btn-info",
-            "icon": "fa-search",
-            "models": lookup_models,
-        }]
+        creatable_models = []
+        searchable_models = []
 
         for model_name in models:
             try:
@@ -181,21 +166,24 @@ class RenderToolbarView(PermissionMixin, View):
             info = (model._meta.app_label, model._meta.model_name)
 
             if self.has_add_permission(model):
-                create_models.append({
+                creatable_models.append({
                     "id": "add_%s--%s.%s" % (field_id, info[0], info[1]),
                     "title": model._meta.verbose_name,
-                    "class": "stream-field__create-block-btn",
                     "url": reverse("admin:%s_%s_add" % info),
+                    "action": "create",
                 })
 
             if self.has_change_permission(model) or self.has_view_permission(model):
-                lookup_models.append({
+                searchable_models.append({
                     "id": "lookup_%s--%s.%s" % (field_id, info[0], info[1]),
                     "title": model._meta.verbose_name,
-                    "class": "stream-field__lookup-block-btn",
                     "url": reverse("admin:%s_%s_changelist" % info),
+                    "action": "lookup",
                 })
 
         return JsonResponse({
-            "buttons": buttons
+            "toolbar": render_to_string("streamfield/admin/toolbar.html", {
+                "creatable_models": creatable_models,
+                "searchable_models": searchable_models,
+            }, request=self.request)
         })
