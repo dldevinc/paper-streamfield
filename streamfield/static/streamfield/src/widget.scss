@@ -26,9 +26,10 @@
 
   }
 
-  &__toolbar {
-    padding-top: 10px;
-  }
+
+  // ============
+  //   Block
+  // ============
 
   &__block {
     display: flex;
@@ -40,19 +41,16 @@
       margin-top: 10px;
     }
 
-    &.sortable-ghost {
-      opacity: 0.75;
-      background-color: #feffd7;
-    }
-
     &--invalid {
+      color: #d04010;
       border-color: #e78b8b;
     }
-
-    &--removing {
-
-    }
   }
+
+
+  // ============
+  //   Sortable
+  // ============
 
   &__sortable-handler {
     padding: 3px 0;
@@ -67,40 +65,65 @@
     background-size: contain;
   }
 
-  &__title {
-    margin-left: 6px;
-
-    &--invalid {
-      color: #d04010;
-    }
+  &__block.sortable-ghost {
+    opacity: 0.75;
+    background-color: #feffd7;
   }
 
-  &__tools {
+
+  // ============
+  //   Content
+  // ============
+
+  &__content {
+    margin-left: 6px;
+  }
+
+  &__block-tools {
     margin-left: auto;
+    padding-left: 5px;
+    flex: 0 0 auto;
+  }
+
+
+  // ============
+  //   Toolbar
+  // ============
+
+  &__toolbar {
+    margin-top: 2px;
   }
 
   &__dropdown {
+    margin-top: 8px;
+  }
+
+  &__dropdown-menu {
     overflow: auto;
-    max-height: 210px;
+    max-height: 300px;
     border: 1px solid #444;
     border-radius: 0.3rem;
     box-shadow: 0 0 0 1px #444;
+  }
 
-    .dropdown-item {
-      &:focus {
-        background-color: #e9ecef;
-        color: #1d1d1d;
-        box-shadow: none;
-      }
+  &__dropdown-item {
+    &:focus {
+      background-color: #e9ecef;
+      color: #1d1d1d;
+      box-shadow: none;
+    }
 
-      &:hover {
-        background-color: #79aec8;
-        color: #fff;
-        font-weight: 400;
-      }
+    &:hover {
+      background-color: #79aec8;
+      color: #fff;
+      font-weight: 400;
     }
   }
 
+
+  // ============
+  //   States
+  // ============
 
   &--loading &__container {
     position: relative;

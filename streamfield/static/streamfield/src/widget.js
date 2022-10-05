@@ -1,5 +1,4 @@
 /* global gettext */
-import Mustache from "mustache";
 import {v4 as uuid4, validate as uuid_validate} from "uuid";
 
 import "./widget.scss";
@@ -23,10 +22,9 @@ class StreamField {
         block: "stream-field__block",
         toolbar: "stream-field__toolbar",
         sortableHandler: "stream-field__sortable-handler",
-        createBlockButton: "stream-field__create-block-btn",
-        lookupBlockButton: "stream-field__lookup-block-btn",
         changeBlockButton: "stream-field__change-btn",
         deleteBlockButton: "stream-field__delete-btn",
+        dropdownItemButton: "stream-field__dropdown-item",  // create or lookup block
     };
 
     constructor(element) {
@@ -230,23 +228,13 @@ class StreamField {
                 }
             }
 
-            const lookupBlockButton = event.target.closest(`.${this.CSS.lookupBlockButton}`);
-            if (lookupBlockButton) {
+            const dropdownItem = event.target.closest(`.${this.CSS.dropdownItemButton}`);
+            if (dropdownItem) {
                 event.preventDefault();
-                const jQueryEvent = $.Event("django:show-related", {href: lookupBlockButton.href});
-                $(lookupBlockButton).trigger(jQueryEvent);
+                const jQueryEvent = $.Event("django:show-related", {href: dropdownItem.href});
+                $(dropdownItem).trigger(jQueryEvent);
                 if (!jQueryEvent.isDefaultPrevented()) {
-                    showStreamBlockPopup(lookupBlockButton);
-                }
-            }
-
-            const createBlockButton = event.target.closest(`.${this.CSS.createBlockButton}`);
-            if (createBlockButton) {
-                event.preventDefault();
-                const jQueryEvent = $.Event("django:show-related", {href: createBlockButton.href});
-                $(createBlockButton).trigger(jQueryEvent);
-                if (!jQueryEvent.isDefaultPrevented()) {
-                    showStreamBlockPopup(createBlockButton);
+                    showStreamBlockPopup(dropdownItem);
                 }
             }
         });
@@ -307,19 +295,7 @@ class StreamField {
             }
             return response.json()
         }).then(response => {
-            const rendered = [];
-            response.blocks.forEach(block => {
-                const status = block.status;
-                const template = this.field.querySelector(`.stream-field__block-template--${status}`);
-                if (!template) {
-                    return
-                }
-
-                rendered.push(
-                    Mustache.render(template.innerHTML, block)
-                )
-            });
-            this.blocks.innerHTML = rendered.join("");
+            this.blocks.innerHTML = response.blocks;
         }).catch(reason => {
             if (reason instanceof Error) {
                 // JS-ошибки дублируем в консоль
@@ -345,19 +321,7 @@ class StreamField {
             }
             return response.json()
         }).then(response => {
-            const template = this.field.querySelector(".stream-field__toolbar-button-template");
-            if (!template) {
-                return
-            }
-
-            const rendered = [];
-            response.buttons.forEach(button => {
-                rendered.push(
-                    Mustache.render(template.innerHTML, button)
-                )
-            });
-
-            this.toolbar.innerHTML = rendered.join("");
+            this.toolbar.innerHTML = response.toolbar;
         });
     }
 

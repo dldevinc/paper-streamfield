@@ -1,0 +1,39 @@
+{% load i18n %}
+
+<div class="stream-field__dropdown dropdown d-inline-block">
+  <button class="btn-success btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+    <i class="fa fa-plus"></i>
+    {% trans "Create new block" %}
+  </button>
+  <ul class="stream-field__dropdown-menu dropdown-menu">
+    {% for model in creatable_models %}
+      <li role="presentation">
+        <a class="stream-field__dropdown-item dropdown-item"
+           href="{{ model.url }}"
+           id="{{ model.id }}"
+           data-action="{{ model.action }}">
+          {{ model.title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="stream-field__dropdown dropdown d-inline-block">
+  <button class="btn-info btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+    <i class="fa fa-search"></i>
+    {% trans "Lookup block" %}
+  </button>
+  <ul class="stream-field__dropdown-menu dropdown-menu">
+    {% for model in searchable_models %}
+      <li role="presentation">
+        <a class="stream-field__dropdown-item dropdown-item"
+           href="{{ model.url }}"
+           id="{{ model.id }}"
+           data-action="{{ model.action }}">
+          {{ model.title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
