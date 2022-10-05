@@ -29,6 +29,15 @@ INSTALLED_APPS = (
 )
 ```
 
+Add `streamfield.urls` to your URLconf:
+
+```python
+urlpatterns = patterns('',
+    ...
+    path("streamfields/", include("streamfield.urls")),
+)
+```
+
 ## How to use
 
 1. Create some models that you want to use as blocks:
