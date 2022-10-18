@@ -1,5 +1,4 @@
 .stream-field {
-
   &__control {
     display: none;
   }
@@ -23,9 +22,7 @@
   }
 
   &__blocks {
-
   }
-
 
   // ============
   //   Block
@@ -37,7 +34,7 @@
     border: 1px solid #d0d0d0;
     border-radius: 0.25rem;
 
-    &:nth-of-type(n+2) {
+    &:nth-of-type(n + 2) {
       margin-top: 10px;
     }
 
@@ -46,7 +43,6 @@
       border-color: #e78b8b;
     }
   }
-
 
   // ============
   //   Sortable
@@ -70,7 +66,6 @@
     background-color: #feffd7;
   }
 
-
   // ============
   //   Content
   // ============
@@ -84,7 +79,6 @@
     padding-left: 5px;
     flex: 0 0 auto;
   }
-
 
   // ============
   //   Toolbar
@@ -119,7 +113,6 @@
       font-weight: 400;
     }
   }
-
 
   // ============
   //   States

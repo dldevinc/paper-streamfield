@@ -1,5 +1,5 @@
 /* global gettext */
-import {v4 as uuid4, validate as uuid_validate} from "uuid";
+import { v4 as uuid4, validate as uuid_validate } from "uuid";
 
 import "./widget.scss";
 
@@ -7,7 +7,6 @@ const Sortable = window.paperAdmin.Sortable;
 const Widget = window.paperAdmin.Widget;
 const popupUtils = window.paperAdmin.popupUtils;
 const modals = window.paperAdmin.modals;
-
 
 class StreamField {
     static STATUS = {
@@ -24,7 +23,7 @@ class StreamField {
         sortableHandler: "stream-field__sortable-handler",
         changeBlockButton: "stream-field__change-btn",
         deleteBlockButton: "stream-field__delete-btn",
-        dropdownItemButton: "stream-field__dropdown-item",  // create or lookup block
+        dropdownItemButton: "stream-field__dropdown-item" // create or lookup block
     };
 
     constructor(element) {
@@ -37,10 +36,7 @@ class StreamField {
         this._addListeners();
         this._updateBlockMap();
 
-        this.wrapPreloader(Promise.all([
-            this.update(),
-            this.updateToolbar(),
-        ]))
+        this.wrapPreloader(Promise.all([this.update(), this.updateToolbar()]));
     }
 
     get STATUS() {
@@ -61,7 +57,7 @@ class StreamField {
         } catch {
             data = [];
         }
-        return data
+        return data;
     }
 
     /**
@@ -103,7 +99,7 @@ class StreamField {
      * @returns {HTMLElement[]}
      */
     getBlocks() {
-        return Array.from(this.blocks.querySelectorAll(`.${this.CSS.block}`))
+        return Array.from(this.blocks.querySelectorAll(`.${this.CSS.block}`));
     }
 
     /**
@@ -133,12 +129,12 @@ class StreamField {
 
         const processedValue = this.value.map(record => {
             let uuid = record["uuid"];
-            if ((typeof uuid === "string") && uuid_validate(uuid)) {
-                return result[uuid] = record;
+            if (typeof uuid === "string" && uuid_validate(uuid)) {
+                return (result[uuid] = record);
             } else {
                 hasBadBlocks = true;
                 uuid = uuid4();
-                return result[uuid] = {uuid: uuid};
+                return (result[uuid] = { uuid: uuid });
             }
         });
 
@@ -203,16 +199,14 @@ class StreamField {
                                 block.remove();
 
                                 this.save();
-                                this.wrapPreloader(
-                                    this.update()
-                                );
+                                this.wrapPreloader(this.update());
                             }
                         }
                     ],
-                    onInit: function() {
+                    onInit: function () {
                         this.show();
                     },
-                    onDestroy: function() {
+                    onDestroy: function () {
                         deleteButton.disabled = false;
                     }
                 });
@@ -221,7 +215,7 @@ class StreamField {
             const changeButton = event.target.closest(`.${this.CSS.changeBlockButton}`);
             if (changeButton) {
                 event.preventDefault();
-                const jQueryEvent = $.Event("django:show-related", {href: changeButton.href});
+                const jQueryEvent = $.Event("django:show-related", { href: changeButton.href });
                 $(changeButton).trigger(jQueryEvent);
                 if (!jQueryEvent.isDefaultPrevented()) {
                     showStreamBlockPopup(changeButton);
@@ -231,7 +225,7 @@ class StreamField {
             const dropdownItem = event.target.closest(`.${this.CSS.dropdownItemButton}`);
             if (dropdownItem) {
                 event.preventDefault();
-                const jQueryEvent = $.Event("django:show-related", {href: dropdownItem.href});
+                const jQueryEvent = $.Event("django:show-related", { href: dropdownItem.href });
                 $(dropdownItem).trigger(jQueryEvent);
                 if (!jQueryEvent.isDefaultPrevented()) {
                     showStreamBlockPopup(dropdownItem);
@@ -276,7 +270,7 @@ class StreamField {
         this.status = this.STATUS.LOADING;
         return promise.finally(() => {
             this.status = this.STATUS.READY;
-        })
+        });
     }
 
     renderStream(data) {
@@ -289,20 +283,23 @@ class StreamField {
                 "Content-Type": "application/json;charset=utf-8"
             },
             body: JSON.stringify(data)
-        }).then(response => {
-            if (!response.ok) {
-                throw `${response.status} ${response.statusText}`;
-            }
-            return response.json()
-        }).then(response => {
-            this.blocks.innerHTML = response.blocks;
-        }).catch(reason => {
-            if (reason instanceof Error) {
-                // JS-ошибки дублируем в консоль
-                console.error(reason);
-            }
-            modals.showErrors(reason);
-        });
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw `${response.status} ${response.statusText}`;
+                }
+                return response.json();
+            })
+            .then(response => {
+                this.blocks.innerHTML = response.blocks;
+            })
+            .catch(reason => {
+                if (reason instanceof Error) {
+                    // JS-ошибки дублируем в консоль
+                    console.error(reason);
+                }
+                modals.showErrors(reason);
+            });
     }
 
     renderToolbar(data) {
@@ -315,24 +312,25 @@ class StreamField {
                 "Content-Type": "application/json;charset=utf-8"
             },
             body: JSON.stringify(data)
-        }).then(response => {
-            if (!response.ok) {
-                throw `${response.status} ${response.statusText}`;
-            }
-            return response.json()
-        }).then(response => {
-            this.toolbar.innerHTML = response.toolbar;
-        });
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw `${response.status} ${response.statusText}`;
+                }
+                return response.json();
+            })
+            .then(response => {
+                this.toolbar.innerHTML = response.toolbar;
+            });
     }
 
     updateToolbar() {
         return this.renderToolbar({
-            "field_id": this.control.id,
-            "models": this.allowedModels
+            field_id: this.control.id,
+            models: this.allowedModels
         });
     }
 }
-
 
 class StreamFieldWidget extends Widget {
     _init(element) {
@@ -351,11 +349,9 @@ class StreamFieldWidget extends Widget {
     }
 }
 
-
 const widget = new StreamFieldWidget();
 widget.observe(".stream-field");
 widget.initAll(".stream-field");
-
 
 /**
  * @param {HTMLElement} triggeringLink
@@ -377,14 +373,12 @@ function dismissAddStreamBlockPopup(win, newId) {
         const streamField = field && widget.getStreamFieldInstance(field);
 
         streamField._appendBlock({
-            "model": `${match[2]}.${match[3]}`,
-            "pk": newId,
-            "uuid": uuid4(),
+            model: `${match[2]}.${match[3]}`,
+            pk: newId,
+            uuid: uuid4()
         });
 
-        streamField.wrapPreloader(
-            streamField.update()
-        );
+        streamField.wrapPreloader(streamField.update());
 
         popupUtils.removeRelatedWindow(win);
         win.close();
@@ -419,9 +413,7 @@ function dismissDeleteStreamBlockPopup(win, objId) {
         const field = control.closest(".stream-field");
         const streamField = field && widget.getStreamFieldInstance(field);
 
-        streamField.wrapPreloader(
-            streamField.update()
-        );
+        streamField.wrapPreloader(streamField.update());
 
         popupUtils.removeRelatedWindow(win);
         win.close();
@@ -442,21 +434,19 @@ function dismissLookupStreamBlockPopup(originalFunc) {
             const streamField = field && widget.getStreamFieldInstance(field);
 
             streamField._appendBlock({
-                "model": `${match[2]}.${match[3]}`,
-                "pk": chosenId,
-                "uuid": uuid4(),
+                model: `${match[2]}.${match[3]}`,
+                pk: chosenId,
+                uuid: uuid4()
             });
 
-            streamField.wrapPreloader(
-                streamField.update()
-            );
+            streamField.wrapPreloader(streamField.update());
 
             popupUtils.removeRelatedWindow(win);
             win.close();
         } else {
             originalFunc(win, chosenId);
         }
-    }
+    };
 }
 
 window.dismissAddStreamBlockPopup = dismissAddStreamBlockPopup;
