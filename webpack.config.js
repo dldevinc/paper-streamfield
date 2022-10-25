@@ -128,7 +128,7 @@ module.exports = (env, argv) => {
             buildDependencies: {
                 config: [__filename]
             }
-        }
+        };
     }
 
     if (config.mode === "production") {
@@ -137,7 +137,7 @@ module.exports = (env, argv) => {
                 parallel: true
             }),
             new CssMinimizerPlugin({})
-        ]
+        ];
     }
 
     return config;

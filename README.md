@@ -105,7 +105,7 @@ class TextBlockAdmin(StreamBlockModelAdmin):
     pass
 ```
 
-3. Create templates for each block model, named as lowercase 
+3. Create templates for each block model, named as lowercase
    model name or _snake_cased_ model name.
 
 ```html
@@ -161,9 +161,7 @@ Now you can create some blocks:
 
 ```html
 <!-- app/templates/index.html -->
-{% load streamfield %}
-
-{% render_stream page.stream %}
+{% load streamfield %} {% render_stream page.stream %}
 ```
 
 Result:
@@ -189,9 +187,7 @@ You can add additional variables by passing keyword arguments to the `render_str
 
 ```html
 <!-- app/templates/index.html -->
-{% load streamfield %}
-
-{% render_stream page.stream css_class="red" %}
+{% load streamfield %} {% render_stream page.stream css_class="red" %}
 ```
 
 ```html
@@ -205,11 +201,7 @@ The parent context can be accessed via a `parent_context` variable:
 
 ```html
 <!-- app/templates/index.html -->
-{% load streamfield %}
-
-{% with css_class="blue" %}
-  {% render_stream page.stream %}
-{% endwith %}
+{% load streamfield %} {% with css_class="blue" %} {% render_stream page.stream %} {% endwith %}
 ```
 
 ```html

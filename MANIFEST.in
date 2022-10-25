@@ -1,9 +1,9 @@
 include LICENSE
-include README.md
-include CHANGELOG.md
+include *.md
+include package.json
 
-recursive-include streamfield *.html
-recursive-include streamfield/static/streamfield/dist *.svg *.css *.js *.map
-recursive-exclude tests *
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
+graft streamfield
+prune streamfield/static/streamfield/src
+global-exclude .git*
+global-exclude __pycache__
+global-exclude *.py[co]
