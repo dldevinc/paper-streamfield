@@ -5,7 +5,6 @@ from typing import Any, Dict, Union
 from django.apps import apps
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.forms import model_to_dict
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.template.loader import render_to_string
 from django.urls import reverse

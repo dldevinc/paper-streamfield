@@ -36,7 +36,6 @@ if jinja2 is not None:
             context.update(kwargs)
             return helpers.render_stream(stream, context, request=request)
 
-
     # django-jinja support
     try:
         from django_jinja import library
