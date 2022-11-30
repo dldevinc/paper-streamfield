@@ -350,8 +350,16 @@ class StreamFieldWidget extends Widget {
 }
 
 const widget = new StreamFieldWidget();
-widget.observe(".stream-field");
-widget.initAll(".stream-field");
+if (typeof widget.bind === "function") {
+    // new-style widgets
+    widget.bind(".stream-field");
+    widget.attach();
+} else {
+    // old-style widgets
+    widget.initAll(".stream-field");
+    widget.observe(".stream-field");
+}
+
 
 /**
  * @param {HTMLElement} triggeringLink
