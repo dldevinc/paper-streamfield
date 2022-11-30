@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.3.0](https://github.com/dldevinc/paper-streamfield/tree/v0.3.0) - 2022-11-30
+
+-   Support for `paper-admin` >= 5.0.
+-   Add Python 3.11 support (no code changes were needed, but now we test this release).
+
 ## [0.2.1](https://github.com/dldevinc/paper-streamfield/tree/v0.2.1) - 2022-10-05
 
 ### Bug fixes
