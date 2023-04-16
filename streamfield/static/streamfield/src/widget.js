@@ -1,10 +1,10 @@
 /* global gettext */
+/* global Sortable */
+/* global XClass */
 import { v4 as uuid4, validate as uuid_validate } from "uuid";
 
 import "./widget.scss";
 
-const Sortable = window.paperAdmin.Sortable;
-const Widget = window.paperAdmin.Widget;
 const popupUtils = window.paperAdmin.popupUtils;
 const modals = window.paperAdmin.modals;
 
@@ -332,34 +332,17 @@ class StreamField {
     }
 }
 
-class StreamFieldWidget extends Widget {
-    _init(element) {
+XClass.register("paper-streamfield", {
+    init: function (element) {
         element._streamField = new StreamField(element, this);
-    }
-
-    _destroy(element) {
+    },
+    destroy: function (element) {
         if (element._streamField) {
             element._streamField.destroy();
             delete element._streamField;
         }
     }
-
-    getStreamFieldInstance(element) {
-        return element._streamField;
-    }
-}
-
-const widget = new StreamFieldWidget();
-if (typeof widget.bind === "function") {
-    // new-style widgets
-    widget.bind(".stream-field");
-    widget.attach();
-} else {
-    // old-style widgets
-    widget.initAll(".stream-field");
-    widget.observe(".stream-field");
-}
-
+});
 
 /**
  * @param {HTMLElement} triggeringLink
@@ -378,7 +361,7 @@ function dismissAddStreamBlockPopup(win, newId) {
     if (match) {
         const control = document.getElementById(match[1]);
         const field = control.closest(".stream-field");
-        const streamField = field && widget.getStreamFieldInstance(field);
+        const streamField = field && field._streamField;
 
         streamField._appendBlock({
             model: `${match[2]}.${match[3]}`,
@@ -401,7 +384,7 @@ function dismissChangeStreamBlockPopup(win) {
     const element = document.getElementById(name);
     const fieldWrapper = element && element.closest(".paper-widget");
     const field = fieldWrapper && fieldWrapper.firstElementChild;
-    const instance = field && widget.getStreamFieldInstance(field);
+    const instance = field && field._streamField;
 
     instance.update();
 
@@ -419,7 +402,7 @@ function dismissDeleteStreamBlockPopup(win, objId) {
     if (match) {
         const control = document.getElementById(match[1]);
         const field = control.closest(".stream-field");
-        const streamField = field && widget.getStreamFieldInstance(field);
+        const streamField = field && field._streamField;
 
         streamField.wrapPreloader(streamField.update());
 
@@ -439,7 +422,7 @@ function dismissLookupStreamBlockPopup(originalFunc) {
         if (match) {
             const control = document.getElementById(match[1]);
             const field = control.closest(".stream-field");
-            const streamField = field && widget.getStreamFieldInstance(field);
+            const streamField = field && field._streamField;
 
             streamField._appendBlock({
                 model: `${match[2]}.${match[3]}`,
