@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
+from paper_admin.menu import Item, Divider
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -140,15 +141,17 @@ PAPER_ENVIRONMENT_NAME = "development"
 PAPER_ENVIRONMENT_COLOR = "#FFFF00"
 
 PAPER_MENU = [
-    dict(
+    Item(
         label=_("Dashboard"),
         url="admin:index",
-        icon="fa fa-fw fa-lg fa-area-chart",
+        icon="bi-lg bi-mb bi-speedometer2",
     ),
-    dict(
+    Item(
         app="app",
-        icon="fa fa-fw fa-lg fa-home",
+        icon="bi-lg bi-mb bi-house-fill",
     ),
-    "-",
-    "auth",
+    Divider(),
+    Item(
+        app="auth",
+    ),
 ]
