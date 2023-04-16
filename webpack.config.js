@@ -12,7 +12,6 @@ const __dirname = path.dirname(__filename);
 const SOURCE_DIR = path.resolve(__dirname, "streamfield/static/streamfield/src");
 const DIST_DIR = path.resolve(__dirname, "streamfield/static/streamfield/dist");
 
-
 // Базовый объект, чьи свойства наследуют все конфигурации.
 function getCommonConfig(devMode) {
     return {
@@ -20,12 +19,12 @@ function getCommonConfig(devMode) {
         devtool: devMode ? "eval" : "source-map",
         cache: devMode
             ? {
-                type: "filesystem",
-                cacheDirectory: path.resolve(__dirname, "cache"),
-                buildDependencies: {
-                    config: [__filename]
-                }
-            }
+                  type: "filesystem",
+                  cacheDirectory: path.resolve(__dirname, "cache"),
+                  buildDependencies: {
+                      config: [__filename]
+                  }
+              }
             : false,
         module: {
             rules: [
@@ -35,8 +34,8 @@ function getCommonConfig(devMode) {
                     loader: "babel-loader",
                     options: devMode
                         ? {
-                            cacheDirectory: path.resolve(__dirname, "cache")
-                        }
+                              cacheDirectory: path.resolve(__dirname, "cache")
+                          }
                         : {}
                 },
 
@@ -110,17 +109,15 @@ function getCommonConfig(devMode) {
         ],
         optimization: {
             moduleIds: "deterministic",
-            minimizer: [
-
-            ].concat(
+            minimizer: [].concat(
                 devMode
                     ? []
                     : [
-                        new TerserPlugin({
-                            parallel: true
-                        }),
-                        new CssMinimizerPlugin({})
-                    ]
+                          new TerserPlugin({
+                              parallel: true
+                          }),
+                          new CssMinimizerPlugin({})
+                      ]
             )
         },
         watchOptions: {
@@ -145,7 +142,7 @@ function getAppConfig(devMode) {
             path: path.resolve(DIST_DIR),
             publicPath: "/static/streamfield/dist/",
             filename: "[name].js",
-            assetModuleFilename: "assets/[name][ext][query]",
+            assetModuleFilename: "assets/[name][ext][query]"
         }
     });
 }
