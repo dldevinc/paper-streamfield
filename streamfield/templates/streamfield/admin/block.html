@@ -18,23 +18,23 @@
           <a href="{{ change_button.url }}"
              id="change_uuid_{{ uuid }}"
              class="stream-field__change-btn btn btn-square btn-sm btn-square--info"
-             data-toggle="tooltip"
+             data-xclass="bs-tooltip"
              data-placement="top"
              data-trigger="hover"
              data-html="true"
              title="{{ change_button.title }}">
-            <i class="fa {{ change_button.icon }}"></i>
+            <i class="{{ change_button.icon }}"></i>
           </a>
         {% endif %}
 
         <button type="button"
                 class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
-                data-toggle="tooltip"
+                data-xclass="bs-tooltip"
                 data-placement="top"
                 data-trigger="hover"
                 data-html="true"
                 title="{{ delete_button.title }}">
-          <i class="fa {{ delete_button.icon }}"></i>
+          <i class="{{ delete_button.icon }}"></i>
         </button>
       </div>
     {% endblock %}

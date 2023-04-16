@@ -97,7 +97,7 @@ class RenderStreamView(PermissionMixin, View):
             "change_button": {
                 "show": has_change_permission or has_view_permission,
                 "title": _("Change block") if has_change_permission else _("View block"),
-                "icon": "fa-pencil" if has_change_permission else "fa-eye",
+                "icon": "bi-pencil-square" if has_change_permission else "bi-eye",
                 "url": reverse(
                     "admin:%s_%s_%s" % (info + ("change",)),
                     args=(block.pk,),
@@ -105,7 +105,7 @@ class RenderStreamView(PermissionMixin, View):
             },
             "delete_button": {
                 "title": _("Delete block"),
-                "icon": "fa-trash"
+                "icon": "bi-trash"
             },
         }, request=self.request)
 
@@ -119,7 +119,7 @@ class RenderStreamView(PermissionMixin, View):
             "title": _("Invalid block"),
             "delete_button": {
                 "title": _("Delete block"),
-                "icon": "fa-trash"
+                "icon": "bi-trash"
             },
         }, request=self.request)
 
