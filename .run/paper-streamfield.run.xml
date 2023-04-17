@@ -19,7 +19,7 @@
       <option name="IS_IGNORE_MISSING_FILES" value="false" />
       <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
       <ENTRIES>
-        <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+        <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
     <option name="launchJavascriptDebuger" value="false" />
@@ -28,7 +28,7 @@
     <option name="additionalOptions" value="" />
     <option name="browserUrl" value="" />
     <option name="runTestServer" value="false" />
-    <option name="runNoReload" value="false" />
+    <option name="runNoReload" value="true" />
     <option name="useCustomRunCommand" value="false" />
     <option name="customRunCommand" value="" />
     <method v="2" />
