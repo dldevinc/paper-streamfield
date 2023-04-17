@@ -3,8 +3,8 @@
   "model": "auth.user",
   "pk": 1,
   "fields": {
-    "password": "pbkdf2_sha256$390000$ykbs9pjxgiDxvBdHfZDIt6$NJdMzr5atIAaPEKxDHkWKIMGe+vmVEl6kPUITqxpDz0=",
-    "last_login": "2022-11-30T14:19:08.514Z",
+    "password": "pbkdf2_sha256$600000$dqpfAAlFMBPbvXiXuXidEY$bO/0Qo4jXyocZIfYwqfuN45lCzHbntt+0vgiqCIpSeo=",
+    "last_login": "2023-04-17T07:30:42.620Z",
     "is_superuser": true,
     "username": "admin",
     "first_name": "",
@@ -40,14 +40,9 @@
         "uuid": "7ef4f609-2a4c-47e2-9d56-93c55172bbbb"
       },
       {
-        "model": "blocks.headerblock",
-        "pk": "9",
-        "uuid": "321c0520-5e4e-4a5d-b40c-94ebe7b074af"
-      },
-      {
         "model": "blocks.imageblock",
-        "pk": "9",
-        "uuid": "3a2a81ac-7229-4b75-9576-c3da147c0820"
+        "pk": "10",
+        "uuid": "a93330dd-a8bd-4454-9256-ae133c9cd37c"
       }
     ]
   }
@@ -77,11 +72,11 @@
 },
 {
   "model": "blocks.imageblock",
-  "pk": 9,
+  "pk": 10,
   "fields": {
-    "image": "varlamov.png",
-    "title": "Varlamov Ilya",
-    "alt": ""
+    "image": "https://images.eksmo.ru/upload/iblock/e45/720.jpg",
+    "title": "",
+    "alt": "Moby Dick poster"
   }
 }
 ]
