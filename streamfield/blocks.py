@@ -6,7 +6,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.utils.module_loading import import_string
 
 from . import conf
-from .typing import BlockInstance, BlockModel
+from .typing import BlockInstance
 
 
 def to_dict(instance: BlockInstance) -> Dict[str, str]:
@@ -48,7 +48,7 @@ def from_dict(value: Dict[str, str]) -> BlockInstance:
     Возвращает экземпляр блока из словаря,
     созданного с помощью функции `to_dict()`.
     """
-    model = apps.get_model(value["model"])  # type: BlockModel
+    model = apps.get_model(value["model"])
     return model._base_manager.get(pk=value["pk"])
 
 
