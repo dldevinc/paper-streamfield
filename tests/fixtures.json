@@ -43,6 +43,11 @@
         "model": "blocks.imageblock",
         "pk": "10",
         "uuid": "a93330dd-a8bd-4454-9256-ae133c9cd37c"
+      },
+      {
+        "model": "blocks.quoteblock",
+        "pk": "1",
+        "uuid": "cfcc5e91-4c02-4189-9d4e-41cde9e047b2"
       }
     ]
   }
@@ -141,6 +146,14 @@
     "image": "https://images.eksmo.ru/upload/iblock/e45/720.jpg",
     "title": "",
     "alt": "Moby Dick poster"
+  }
+},
+{
+  "model": "blocks.quoteblock",
+  "pk": 1,
+  "fields": {
+    "text": "The journey of a thousand miles begins with a single step.",
+    "author": "Lao Tzu"
   }
 }
 ]
