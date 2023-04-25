@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from streamfield.admin import StreamBlockModelAdmin
 
-from .models import HeaderBlock, ImageBlock, TextBlock
+from .models import HeaderBlock, ImageBlock, TextBlock, QuoteBlock
 
 
 @admin.register(HeaderBlock)
@@ -17,4 +17,9 @@ class ImageBlockAdmin(StreamBlockModelAdmin):
 
 @admin.register(TextBlock)
 class TextBlockAdmin(StreamBlockModelAdmin):
+    pass
+
+
+@admin.register(QuoteBlock)
+class QuoteBlockAdmin(StreamBlockModelAdmin):
     pass
