@@ -82,7 +82,7 @@ class RenderStreamView(PermissionMixin, View):
             return self.block_invalid(record, _("Invalid data format"))
 
         if record["model"] not in allowed_models:
-            return self.block_invalid(record, _("Derived class is not allowed here"))
+            return self.block_invalid(record, _("The specified class is not allowed here"))
 
         try:
             block = blocks.from_dict(record)
