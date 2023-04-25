@@ -3,7 +3,7 @@
 <div class="stream-field__dropdown dropdown d-inline-block">
   <button class="btn-success btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
     <i class="bi-plus-lg"></i>
-    {% trans "Create new block" %}
+    <span>{% trans "Create new block" %}</span>
   </button>
   <ul class="stream-field__dropdown-menu dropdown-menu">
     {% for model in creatable_models %}
@@ -22,7 +22,7 @@
 <div class="stream-field__dropdown dropdown d-inline-block">
   <button class="btn-info btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
     <i class="bi-search"></i>
-    {% trans "Lookup block" %}
+    <span>{% trans "Lookup block" %}</span>
   </button>
   <ul class="stream-field__dropdown-menu dropdown-menu">
     {% for model in searchable_models %}

@@ -72,12 +72,16 @@ class RenderStreamView(PermissionMixin, View):
 
     def render_block(self, record: Dict[str, Any]) -> str:
         if not blocks.is_valid(record):
-            return self.block_invalid(record)
+            return self.block_invalid(record, _("Invalid data format"))
 
         try:
             block = blocks.from_dict(record)
-        except (LookupError, ObjectDoesNotExist, MultipleObjectsReturned):
-            return self.block_invalid(record)
+        except LookupError:
+            return self.block_invalid(record, _("Model not found"))
+        except ObjectDoesNotExist:
+            return self.block_invalid(record, _("Instance not found"))
+        except MultipleObjectsReturned:
+            return self.block_invalid(record, _("Multiple objects returned"))
         else:
             return self.block_valid(record, block)
 
@@ -109,14 +113,14 @@ class RenderStreamView(PermissionMixin, View):
             },
         }, request=self.request)
 
-    def block_invalid(self, record: Dict[str, Any]) -> str:
+    def block_invalid(self, record: Dict[str, Any], reason: str) -> str:
         model = record.get("model", "undefined")
         pk = record.get("pk", "undefined")
         return render_to_string("streamfield/admin/invalid_block.html", {
             "uuid": record.get("uuid", ""),
             "model": model,
             "pk": pk,
-            "title": _("Invalid block"),
+            "title": _("Error: %s") % reason,
             "delete_button": {
                 "title": _("Delete block"),
                 "icon": "bi-trash"
