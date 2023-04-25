@@ -124,7 +124,7 @@ class RenderStreamView(PermissionMixin, View):
         }, request=self.request)
 
 
-class RenderToolbarView(PermissionMixin, View):
+class RenderButtonsView(PermissionMixin, View):
     """
     Проверка прав на переданные модели для отрисовки кнопок StreamField.
     """
@@ -182,7 +182,7 @@ class RenderToolbarView(PermissionMixin, View):
                 })
 
         return JsonResponse({
-            "toolbar": render_to_string("streamfield/admin/toolbar.html", {
+            "buttons": render_to_string("streamfield/admin/buttons.html", {
                 "creatable_models": creatable_models,
                 "searchable_models": searchable_models,
             }, request=self.request)
