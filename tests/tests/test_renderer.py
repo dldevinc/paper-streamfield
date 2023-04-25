@@ -34,16 +34,16 @@ def test_render_template():
 
 
 def test_render_non_existent_template():
-    with pytest.raises(TemplateDoesNotExist, match="blocks/quoteblock.html, blocks/quote_block.html"):
+    with pytest.raises(TemplateDoesNotExist, match="blocks/listblock.html, blocks/list_block.html"):
         assert render_template(Mock(
-            spec=["text", "_meta", "__class__"],
+            spec=["title", "_meta", "__class__"],
             __class__=Mock(
-                __name__="QuoteBlock"
+                __name__="ListBlock"
             ),
             _meta=Mock(
                 app_label="blocks",
             ),
-            text="Example header"
+            title="Example title"
         ))
 
 
