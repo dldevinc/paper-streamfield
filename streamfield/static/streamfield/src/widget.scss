@@ -51,13 +51,13 @@
   // ============
 
   &__sortable-handler {
-    padding: 3px 0;
+    padding: 5px 0;
     margin: -5px 0;
     cursor: move;
   }
 
   &__sortable-icon {
-    width: 16px;
+    width: 18px;
     height: 100%;
     background: url("./img/sortable.svg");
     background-size: contain;
@@ -73,13 +73,27 @@
   // ============
 
   &__content {
+    overflow: hidden;
+    line-height: 18px;
+  }
 
+  &__title {
+    overflow: hidden;
+    margin: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__type {
+    margin: 0;
+    color: var(--gray, #9a9a9a);
+    font-size: 0.75rem;
   }
 
   &__block-tools {
     margin-left: auto;
+    padding: 3px 0;
     flex: 0 0 auto;
-    align-self: center;
   }
 
   // ============

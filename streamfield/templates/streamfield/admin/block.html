@@ -5,38 +5,35 @@
 
   <div class="stream-field__content">
     {% block content %}
-      {{ title }}
-      <br>
-      <small class="text-muted">{{ verbose_name }}</small>
+      <p class="stream-field__title">{{ title }}</p>
+      <p class="stream-field__type">{{ verbose_name }}</p>
     {% endblock content %}
   </div>
 
   <div class="stream-field__block-tools">
-    {% block tools %}
-      <div class="btn-square-group">
+    <div class="btn-square-group">
+      {% block tools %}
         {% if change_button.show %}
           <a href="{{ change_button.url }}"
              id="change_uuid_{{ uuid }}"
-             class="stream-field__change-btn btn btn-square btn-sm btn-square--info"
+             class="stream-field__change-btn btn btn-square btn-sm btn-square--info {{ change_button.icon }}"
              data-xclass="bs-tooltip"
              data-placement="top"
              data-trigger="hover"
              data-html="true"
              title="{{ change_button.title }}">
-            <i class="{{ change_button.icon }}"></i>
           </a>
         {% endif %}
 
         <button type="button"
-                class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger"
+                class="stream-field__delete-btn btn btn-square btn-sm btn-square--danger {{ delete_button.icon }}"
                 data-xclass="bs-tooltip"
                 data-placement="top"
                 data-trigger="hover"
                 data-html="true"
                 title="{{ delete_button.title }}">
-          <i class="{{ delete_button.icon }}"></i>
         </button>
-      </div>
-    {% endblock %}
+      {% endblock %}
+    </div>
   </div>
 </div>
