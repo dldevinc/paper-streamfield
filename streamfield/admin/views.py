@@ -1,6 +1,6 @@
 import json
 from json import JSONDecodeError
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, List
 
 from django.apps import apps
 from django.contrib.auth import get_permission_codename
@@ -54,10 +54,17 @@ class RenderStreamView(PermissionMixin, View):
 
     def post(self, request):
         try:
-            stream = json.loads(request.body)
+            data = json.loads(request.body)
         except JSONDecodeError:
             logger.warning("Stream is not valid JSON")
             return HttpResponseBadRequest("Stream is not valid JSON")
+
+        try:
+            allowed_models = data["allowedModels"]
+            stream = data["value"]
+        except KeyError:
+            logger.warning("Invalid request data")
+            return HttpResponseBadRequest("Invalid request data")
 
         if not isinstance(stream, list):
             logger.warning("Invalid stream type")
@@ -65,14 +72,17 @@ class RenderStreamView(PermissionMixin, View):
 
         return JsonResponse({
             "blocks": "".join(
-                self.render_block(block_data)
-                for block_data in stream
+                self.render_block(record, allowed_models)
+                for record in stream
             )
         })
 
-    def render_block(self, record: Dict[str, Any]) -> str:
+    def render_block(self, record: Dict[str, Any], allowed_models: List["str"]) -> str:
         if not blocks.is_valid(record):
             return self.block_invalid(record, _("Invalid data format"))
+
+        if record["model"] not in allowed_models:
+            return self.block_invalid(record, _("Derived class is not allowed here"))
 
         try:
             block = blocks.from_dict(record)
@@ -144,24 +154,24 @@ class RenderButtonsView(PermissionMixin, View):
             return HttpResponseBadRequest()
 
         try:
-            models = data["models"]
+            allowed_models = data["allowedModels"]
             field_id = data["field_id"]
         except KeyError:
-            logger.warning("Invalid request body")
-            return HttpResponseBadRequest("Invalid request body")
+            logger.warning("Invalid request data")
+            return HttpResponseBadRequest("Invalid request data")
 
-        if not isinstance(models, list):
-            logger.warning("Invalid request body")
-            return HttpResponseBadRequest("Invalid request body")
+        if not isinstance(allowed_models, list):
+            logger.warning("Invalid request data")
+            return HttpResponseBadRequest("Invalid request data")
 
-        if not all(isinstance(item, str) for item in models):
-            logger.warning("Invalid request body")
-            return HttpResponseBadRequest("Invalid request body")
+        if not all(isinstance(item, str) for item in allowed_models):
+            logger.warning("Invalid request data")
+            return HttpResponseBadRequest("Invalid request data")
 
         creatable_models = []
         searchable_models = []
 
-        for model_name in models:
+        for model_name in allowed_models:
             try:
                 model = apps.get_model(model_name)  # type: BlockModel
             except LookupError:
