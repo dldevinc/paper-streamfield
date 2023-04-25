@@ -12,6 +12,7 @@ class HeaderBlockAdmin(StreamBlockModelAdmin):
 
 @admin.register(ImageBlock)
 class ImageBlockAdmin(StreamBlockModelAdmin):
+    stream_block_template = "blocks/admin/image.html"
     list_display = ["__str__", "title"]
 
 

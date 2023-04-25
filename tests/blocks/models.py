@@ -40,8 +40,6 @@ class TextBlock(models.Model):
 
 
 class ImageBlock(models.Model):
-    admin_block_template = "blocks/admin/image.html"
-
     image = models.URLField(
         _("image")
     )

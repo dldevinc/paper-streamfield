@@ -15,18 +15,3 @@
     </div>
   </div>
 {% endblock content %}
-
-
-{% block tools %}
-  <a href="{{ instance.image }}"
-     class="btn btn-square btn-sm btn-square--info bi-eye"
-     data-xclass="bs-tooltip"
-     data-placement="top"
-     data-trigger="hover"
-     data-html="true"
-     title="{{ _("View image") }}"
-     target="_blank">
-  </a>
-
-  {{ block.super }}
-{% endblock %}

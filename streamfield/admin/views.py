@@ -3,7 +3,6 @@ from json import JSONDecodeError
 from typing import Any, Dict, Union, List
 
 from django.apps import apps
-from django.contrib.auth import get_permission_codename
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.template.loader import render_to_string
@@ -12,63 +11,54 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from .. import blocks, conf
+from .. import blocks
 from ..logging import logger
 from ..typing import BlockInstance, BlockModel
 
 
-class PermissionMixin:
-    def has_add_permission(self, model: BlockModel):
-        opts = model._meta
-        codename = get_permission_codename("add", opts)
-        return self.request.user.has_perm("%s.%s" % (opts.app_label, codename))
-
-    def has_change_permission(self, model_or_block: Union[BlockModel, BlockInstance]):
-        opts = model_or_block._meta
-        codename = get_permission_codename("change", opts)
-        return self.request.user.has_perm("%s.%s" % (opts.app_label, codename))
-
-    def has_delete_permission(self, model_or_block: Union[BlockModel, BlockInstance]):
-        opts = model_or_block._meta
-        codename = get_permission_codename("delete", opts)
-        return self.request.user.has_perm("%s.%s" % (opts.app_label, codename))
-
-    def has_view_permission(self, model_or_block: Union[BlockModel, BlockInstance]):
-        opts = model_or_block._meta
-        codename_view = get_permission_codename("view", opts)
-        codename_change = get_permission_codename("change", opts)
-        return self.request.user.has_perm(
-            "%s.%s" % (opts.app_label, codename_view)
-        ) or self.request.user.has_perm(
-            "%s.%s" % (opts.app_label, codename_change)
-        )
+class Http400(Exception):
+    pass
 
 
-class RenderStreamView(PermissionMixin, View):
-    """
-    Отрисовка поля StreamField в соответствии с переданными JSON-данными.
-    """
+class AdminStreamViewMixin:
+    admin_site = None
+
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request):
         try:
-            data = json.loads(request.body)
+            return super().dispatch(request, *args, **kwargs)
+        except Http400 as exc:
+            message = exc.args[0] if exc.args else ""
+            logger.warning(message)
+            return HttpResponseBadRequest(message)
+
+    def parse_request_json(self):
+        try:
+            return json.loads(self.request.body)
         except JSONDecodeError:
-            logger.warning("Stream is not valid JSON")
-            return HttpResponseBadRequest("Stream is not valid JSON")
+            raise Http400(_("The request body is not valid JSON"))
+
+    def get_model_admin(self, model: BlockModel):
+        """
+        :rtype: django.contrib.admin.ModelAdmin | None
+        """
+        if model not in self.admin_site._registry:
+            return None
+        return self.admin_site._registry[model]
+
+
+class RenderStreamView(AdminStreamViewMixin, View):
+    def post(self, request):
+        data = self.parse_request_json()
 
         try:
             allowed_models = data["allowedModels"]
             stream = data["value"]
         except KeyError:
-            logger.warning("Invalid request data")
-            return HttpResponseBadRequest("Invalid request data")
+            raise Http400(_("Invalid request data"))
 
         if not isinstance(stream, list):
-            logger.warning("Invalid stream type")
-            return HttpResponseBadRequest("Invalid stream type")
+            raise Http400(_("Invalid stream type"))
 
         return JsonResponse({
             "blocks": "".join(
@@ -96,77 +86,40 @@ class RenderStreamView(PermissionMixin, View):
             return self.block_valid(record, block)
 
     def block_valid(self, record: Dict[str, Any], block: BlockInstance) -> str:
-        info = (block._meta.app_label, block._meta.model_name)
-        has_change_permission = self.has_change_permission(block)
-        has_view_permission = self.has_view_permission(block)
-
-        admin_template = getattr(block, "admin_block_template", conf.DEFAULT_ADMIN_BLOCK_TEMPLATE)
-        return render_to_string(admin_template, {
+        model_admin = self.get_model_admin(type(block))
+        template = getattr(model_admin, "stream_block_template")
+        return render_to_string(template, {
             "uuid": record["uuid"],
-            "model": record["model"],
-            "pk": record["pk"],
             "instance": block,
-            "title": str(block),
-            "verbose_name": block._meta.verbose_name,
-            "change_button": {
-                "show": has_change_permission or has_view_permission,
-                "title": _("Change block") if has_change_permission else _("View block"),
-                "icon": "bi-pencil-square" if has_change_permission else "bi-eye",
-                "url": reverse(
-                    "admin:%s_%s_%s" % (info + ("change",)),
-                    args=(block.pk,),
-                ),
-            },
-            "delete_button": {
-                "title": _("Delete block"),
-                "icon": "bi-trash"
-            },
+            "opts": block._meta,
+            "has_change_permission": model_admin.has_change_permission(self.request, block) if model_admin is not None else False,
+            "has_view_permission": model_admin.has_view_permission(self.request, block) if model_admin is not None else False,
         }, request=self.request)
 
     def block_invalid(self, record: Dict[str, Any], reason: str) -> str:
-        model = record.get("model", "undefined")
-        pk = record.get("pk", "undefined")
         return render_to_string("streamfield/admin/invalid_block.html", {
             "uuid": record.get("uuid", ""),
-            "model": model,
-            "pk": pk,
-            "title": _("Error: %s") % reason,
-            "delete_button": {
-                "title": _("Delete block"),
-                "icon": "bi-trash"
-            },
+            "model": record.get("model", "undefined"),
+            "pk": record.get("pk", "undefined"),
+            "reason": reason,
         }, request=self.request)
 
 
-class RenderButtonsView(PermissionMixin, View):
-    """
-    Проверка прав на переданные модели для отрисовки кнопок StreamField.
-    """
-    @csrf_exempt
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
+class RenderButtonsView(AdminStreamViewMixin, View):
     def post(self, request):
-        try:
-            data = json.loads(request.body)
-        except JSONDecodeError:
-            logger.warning("Request is not valid JSON")
-            return HttpResponseBadRequest()
+        data = self.parse_request_json()
 
         try:
             allowed_models = data["allowedModels"]
             field_id = data["field_id"]
         except KeyError:
-            logger.warning("Invalid request data")
-            return HttpResponseBadRequest("Invalid request data")
+            raise Http400(_("Invalid request data"))
 
         if not isinstance(allowed_models, list):
-            logger.warning("Invalid request data")
-            return HttpResponseBadRequest("Invalid request data")
+            raise Http400(_("Invalid request data"))
 
         if not all(isinstance(item, str) for item in allowed_models):
-            logger.warning("Invalid request data")
-            return HttpResponseBadRequest("Invalid request data")
+            raise Http400(_("Invalid request data"))
 
         creatable_models = []
         searchable_models = []
@@ -177,9 +130,16 @@ class RenderButtonsView(PermissionMixin, View):
             except LookupError:
                 continue
 
-            info = (model._meta.app_label, model._meta.model_name)
+            model_admin = self.get_model_admin(model)
+            if model_admin is None:
+                continue
 
-            if self.has_add_permission(model):
+            info = (model._meta.app_label, model._meta.model_name)
+            has_add_permission = model_admin.has_add_permission(self.request)
+            has_change_permission = model_admin.has_change_permission(self.request)
+            has_view_permission = model_admin.has_view_permission(self.request)
+
+            if has_add_permission:
                 creatable_models.append({
                     "id": "add_%s--%s.%s" % (field_id, info[0], info[1]),
                     "title": model._meta.verbose_name,
@@ -187,7 +147,7 @@ class RenderButtonsView(PermissionMixin, View):
                     "action": "create",
                 })
 
-            if self.has_change_permission(model) or self.has_view_permission(model):
+            if has_change_permission or has_view_permission:
                 searchable_models.append({
                     "id": "lookup_%s--%s.%s" % (field_id, info[0], info[1]),
                     "title": model._meta.verbose_name,
