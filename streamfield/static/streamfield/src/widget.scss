@@ -22,6 +22,7 @@
   }
 
   &__blocks {
+
   }
 
   // ============
@@ -31,16 +32,17 @@
   &__block {
     display: flex;
     padding: 5px 5px 5px 0;
-    border: 1px solid #d0d0d0;
-    border-radius: 0.25rem;
+    gap: 6px;
+    border-radius: var(--border-radius, 0.25rem);
+    box-shadow: 0 0 0 1px var(--input-border-color, #d0d0d0);
 
     &:nth-of-type(n + 2) {
       margin-top: 10px;
     }
 
     &--invalid {
-      color: #d04010;
-      border-color: #e78b8b;
+      color: var(--input-invalid-color, #d04010);
+      box-shadow: 0 0 0 2px var(--input-invalid-border-color, #df7d5c);
     }
   }
 
@@ -71,13 +73,13 @@
   // ============
 
   &__content {
-    margin-left: 6px;
+
   }
 
   &__block-tools {
     margin-left: auto;
-    padding-left: 5px;
     flex: 0 0 auto;
+    align-self: center;
   }
 
   // ============
@@ -85,7 +87,9 @@
   // ============
 
   &__buttons {
+    display: flex;
     margin-top: 2px;
+    gap: 8px;
   }
 
   &__dropdown {
