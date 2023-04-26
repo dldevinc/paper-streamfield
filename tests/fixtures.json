@@ -3,8 +3,8 @@
   "model": "auth.user",
   "pk": 1,
   "fields": {
-    "password": "pbkdf2_sha256$390000$ykbs9pjxgiDxvBdHfZDIt6$NJdMzr5atIAaPEKxDHkWKIMGe+vmVEl6kPUITqxpDz0=",
-    "last_login": "2022-11-30T14:19:08.514Z",
+    "password": "pbkdf2_sha256$600000$dqpfAAlFMBPbvXiXuXidEY$bO/0Qo4jXyocZIfYwqfuN45lCzHbntt+0vgiqCIpSeo=",
+    "last_login": "2023-04-25T11:58:41.983Z",
     "is_superuser": true,
     "username": "admin",
     "first_name": "",
@@ -40,14 +40,49 @@
         "uuid": "7ef4f609-2a4c-47e2-9d56-93c55172bbbb"
       },
       {
-        "model": "blocks.headerblock",
-        "pk": "9",
-        "uuid": "321c0520-5e4e-4a5d-b40c-94ebe7b074af"
+        "model": "blocks.imageblock",
+        "pk": "10",
+        "uuid": "a93330dd-a8bd-4454-9256-ae133c9cd37c"
       },
       {
-        "model": "blocks.imageblock",
+        "model": "blocks.quoteblock",
+        "pk": "1",
+        "uuid": "cfcc5e91-4c02-4189-9d4e-41cde9e047b2"
+      }
+    ]
+  }
+},
+{
+  "model": "app.page",
+  "pk": 3,
+  "fields": {
+    "header": "Invalid block",
+    "slug": "invalid-block",
+    "stream": [
+      {
+        "model": "blocks.headerblock",
         "pk": "9",
-        "uuid": "3a2a81ac-7229-4b75-9576-c3da147c0820"
+        "uuid": "8a82a620-021b-4a65-a2f7-3e14c3c75737"
+      },
+      {
+        "model": "blocks.textblock",
+        "pk": "2",
+        "uuid": "0858e5ce-7ef9-488e-afe2-0e6e1205cbab"
+      },
+      {
+        "model": "blocks.textblock",
+        "pk": "5",
+        "uuid": "5f830aa5-e584-4dc6-bff8-543cdfea1548"
+      },
+      {
+        "class": "blocks.textblock",
+        "pk": "3",
+        "uuid": "d2e4b7f7-8c18-4ca2-9bb7-29d6d0de4556"
+      },
+      {
+        "model": "blocks.textbloc",
+        "pk": "4",
+        "uuid": "eb9f11df-75eb-47c3-9488-b0a608d2f3dd"
       }
     ]
   }
@@ -69,6 +104,14 @@
   }
 },
 {
+  "model": "blocks.headerblock",
+  "pk": 9,
+  "fields": {
+    "text": "Chapter One",
+    "rank": 2
+  }
+},
+{
   "model": "blocks.textblock",
   "pk": 1,
   "fields": {
@@ -76,12 +119,41 @@
   }
 },
 {
-  "model": "blocks.imageblock",
-  "pk": 9,
+  "model": "blocks.textblock",
+  "pk": 2,
   "fields": {
-    "image": "varlamov.png",
-    "title": "Varlamov Ilya",
-    "alt": ""
+    "text": "I scowl with frustration at myself in the mirror. Damn my hair - it just won't behave, and damn Katherine Kavanagh for being ill and subjecting me to this ordeal. I should be studying for my final exams, which are next week, yet here I am trying to brush my hair into submission. I must not sleep with it wet. I must not sleep with it wet. Reciting this mantra several times, I attempt, once more, to bring it under control with the brush. I roll my eyes in exasperation and gaze at the pale, brown-haired girl with blue eyes too big for her face staring back at me, and give up. My only option is to restrain my wayward hair in a ponytail and hope that I look semi presentable."
+  }
+},
+{
+  "model": "blocks.textblock",
+  "pk": 3,
+  "fields": {
+    "text": "Kate is my roommate, and she has chosen today of all days to succumb to the flu."
+  }
+},
+{
+  "model": "blocks.textblock",
+  "pk": 4,
+  "fields": {
+    "text": "Therefore, she cannot attend the interview she'd arranged to do, with some mega-industri-alist tycoon I've never heard of, for the student newspaper. So I have been volunteered. I have final exams to cram for, one essay to finish, and I'm supposed to be working this afternoon, but no - today I have to drive a hundred and sixty-five miles to downtown Seattle in order to meet the enigmatic CEO of Grey Enterprises Holdings Inc. As an exceptional entrepreneur and major benefactor of our University, his time is extraordinarily precious - much more precious than mine - but he has granted Kate an interview. A real coup, she tells me. Damn her extra-curricular activities."
+  }
+},
+{
+  "model": "blocks.imageblock",
+  "pk": 10,
+  "fields": {
+    "image": "https://images.eksmo.ru/upload/iblock/e45/720.jpg",
+    "title": "",
+    "alt": "Moby Dick poster"
+  }
+},
+{
+  "model": "blocks.quoteblock",
+  "pk": 1,
+  "fields": {
+    "text": "The journey of a thousand miles begins with a single step.",
+    "author": "Lao Tzu"
   }
 }
 ]

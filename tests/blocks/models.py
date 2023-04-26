@@ -35,14 +35,16 @@ class TextBlock(models.Model):
     class Meta:
         verbose_name = "Text"
 
+    class StreamBlockMeta:
+        engine = "django"
+        template = "blocks/text.html"
+
     def __str__(self):
-        return Truncator(self.text).chars(64)
+        return Truncator(self.text).chars(96)
 
 
 class ImageBlock(models.Model):
-    admin_block_template = "blocks/admin/image.html"
-
-    image = models.ImageField(
+    image = models.URLField(
         _("image")
     )
     title = models.CharField(
@@ -76,4 +78,6 @@ class QuoteBlock(models.Model):
         verbose_name = "Quote"
 
     def __str__(self):
-        return Truncator(self.text).chars(64)
+        return Truncator(
+            "{}: {}".format(self.author, self.text)
+        ).chars(96)

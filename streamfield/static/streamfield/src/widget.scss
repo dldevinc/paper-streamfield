@@ -22,6 +22,7 @@
   }
 
   &__blocks {
+
   }
 
   // ============
@@ -31,8 +32,9 @@
   &__block {
     display: flex;
     padding: 5px 5px 5px 0;
-    border: 1px solid #d0d0d0;
-    border-radius: 0.25rem;
+    gap: 6px;
+    border-radius: var(--border-radius, 0.25rem);
+    box-shadow: 0 0 0 1px var(--input-border-color, #d0d0d0);
 
     &:nth-of-type(n + 2) {
       margin-top: 10px;
@@ -40,7 +42,7 @@
 
     &--invalid {
       color: #d04010;
-      border-color: #e78b8b;
+      box-shadow: 0 0 0 2px var(--input-invalid-border-color, #df7d5c);
     }
   }
 
@@ -49,13 +51,13 @@
   // ============
 
   &__sortable-handler {
-    padding: 3px 0;
+    padding: 5px 0;
     margin: -5px 0;
     cursor: move;
   }
 
   &__sortable-icon {
-    width: 16px;
+    width: 18px;
     height: 100%;
     background: url("./img/sortable.svg");
     background-size: contain;
@@ -71,21 +73,37 @@
   // ============
 
   &__content {
-    margin-left: 6px;
+    overflow: hidden;
+    line-height: 18px;
+  }
+
+  &__title {
+    overflow: hidden;
+    margin: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__type {
+    margin: 0;
+    color: var(--gray, #9a9a9a);
+    font-size: 0.75rem;
   }
 
   &__block-tools {
     margin-left: auto;
-    padding-left: 5px;
+    padding: 3px 0;
     flex: 0 0 auto;
   }
 
   // ============
-  //   Toolbar
+  //   Buttons
   // ============
 
-  &__toolbar {
+  &__buttons {
+    display: flex;
     margin-top: 2px;
+    gap: 6px;
   }
 
   &__dropdown {
@@ -96,7 +114,6 @@
     overflow: auto;
     max-height: 300px;
     border: 1px solid #444;
-    border-radius: 0.3rem;
     box-shadow: 0 0 0 1px #444;
   }
 

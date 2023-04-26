@@ -1,10 +1,10 @@
 <div class="stream-field"
      data-xclass="paper-streamfield"
      data-render-stream-url="{% url "streamfields:render-stream" %}"
-     data-render-toolbar-url="{% url "streamfields:render-toolbar" %}">
+     data-render-buttons-url="{% url "streamfields:render-buttons" %}">
   <textarea name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>{{ widget.value|default:"" }}</textarea>
   <div class="stream-field__container">
     <div class="stream-field__blocks"></div>
-    <div class="stream-field__toolbar"></div>
+    <div class="stream-field__buttons"></div>
   </div>
 </div>

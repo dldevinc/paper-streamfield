@@ -18,7 +18,9 @@ def resolve_template(name, using=None):
 
 
 def render_template(block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None) -> str:
-    block_template = getattr(block, "block_template", None)
+    meta = getattr(block, "StreamBlockMeta", None)
+
+    block_template = getattr(meta, "template", None)
     if block_template is None:
         app_label, model_name = block._meta.app_label, block.__class__.__name__
         block_template = (
@@ -26,8 +28,8 @@ def render_template(block: BlockInstance, extra_context: Dict = None, request: W
             "%s/%s.html" % (app_label, camel_case_to_snake_case(model_name)),
         )
 
-    template_engine = getattr(block, "block_template_engine", conf.DEFAULT_TEMPLATE_ENGINE)
-    template = resolve_template(block_template, using=template_engine)
+    engine = getattr(meta, "engine", conf.DEFAULT_TEMPLATE_ENGINE)
+    template = resolve_template(block_template, using=engine)
 
     context = {
         "block": block

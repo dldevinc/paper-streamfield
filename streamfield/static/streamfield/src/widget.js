@@ -19,7 +19,7 @@ class StreamField {
         control: "stream-field__control",
         blocks: "stream-field__blocks",
         block: "stream-field__block",
-        toolbar: "stream-field__toolbar",
+        buttons: "stream-field__buttons",
         sortableHandler: "stream-field__sortable-handler",
         changeBlockButton: "stream-field__change-btn",
         deleteBlockButton: "stream-field__delete-btn",
@@ -30,13 +30,13 @@ class StreamField {
         this.field = element;
         this.control = this.field.querySelector(`.${this.CSS.control}`);
         this.blocks = this.field.querySelector(`.${this.CSS.blocks}`);
-        this.toolbar = this.field.querySelector(`.${this.CSS.toolbar}`);
+        this.buttons = this.field.querySelector(`.${this.CSS.buttons}`);
 
         this._sortable = this._initSortable();
         this._addListeners();
         this._updateBlockMap();
 
-        this.wrapPreloader(Promise.all([this.update(), this.updateToolbar()]));
+        this.wrapPreloader(Promise.all([this.updateBlocks(), this.updateButtons()]));
     }
 
     get STATUS() {
@@ -199,7 +199,7 @@ class StreamField {
                                 block.remove();
 
                                 this.save();
-                                this.wrapPreloader(this.update());
+                                this.wrapPreloader(this.updateBlocks());
                             }
                         }
                     ],
@@ -258,10 +258,6 @@ class StreamField {
         });
     }
 
-    update() {
-        return this.renderStream(this.value);
-    }
-
     /**
      * @param {Promise} promise
      * @returns {Promise}
@@ -270,6 +266,13 @@ class StreamField {
         this.status = this.STATUS.LOADING;
         return promise.finally(() => {
             this.status = this.STATUS.READY;
+        });
+    }
+
+    updateBlocks() {
+        return this.renderStream({
+            allowedModels: this.allowedModels,
+            value: this.value
         });
     }
 
@@ -302,8 +305,15 @@ class StreamField {
             });
     }
 
-    renderToolbar(data) {
-        const renderUrl = this.field.dataset.renderToolbarUrl;
+    updateButtons() {
+        return this.renderButtons({
+            field_id: this.control.id,
+            allowedModels: this.allowedModels
+        });
+    }
+
+    renderButtons(data) {
+        const renderUrl = this.field.dataset.renderButtonsUrl;
         return fetch(renderUrl, {
             method: "POST",
             mode: "same-origin",
@@ -320,15 +330,8 @@ class StreamField {
                 return response.json();
             })
             .then(response => {
-                this.toolbar.innerHTML = response.toolbar;
+                this.buttons.innerHTML = response.buttons;
             });
-    }
-
-    updateToolbar() {
-        return this.renderToolbar({
-            field_id: this.control.id,
-            models: this.allowedModels
-        });
     }
 }
 
@@ -369,7 +372,7 @@ function dismissAddStreamBlockPopup(win, newId) {
             uuid: uuid4()
         });
 
-        streamField.wrapPreloader(streamField.update());
+        streamField.wrapPreloader(streamField.updateBlocks());
 
         popupUtils.removeRelatedWindow(win);
         win.close();
@@ -386,7 +389,7 @@ function dismissChangeStreamBlockPopup(win) {
     const field = fieldWrapper && fieldWrapper.firstElementChild;
     const instance = field && field._streamField;
 
-    instance.update();
+    instance.updateBlocks();
 
     popupUtils.removeRelatedWindow(win);
     win.close();
@@ -404,7 +407,7 @@ function dismissDeleteStreamBlockPopup(win, objId) {
         const field = control.closest(".stream-field");
         const streamField = field && field._streamField;
 
-        streamField.wrapPreloader(streamField.update());
+        streamField.wrapPreloader(streamField.updateBlocks());
 
         popupUtils.removeRelatedWindow(win);
         win.close();
@@ -430,7 +433,7 @@ function dismissLookupStreamBlockPopup(originalFunc) {
                 uuid: uuid4()
             });
 
-            streamField.wrapPreloader(streamField.update());
+            streamField.wrapPreloader(streamField.updateBlocks());
 
             popupUtils.removeRelatedWindow(win);
             win.close();
