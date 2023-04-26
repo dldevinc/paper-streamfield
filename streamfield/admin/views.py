@@ -1,6 +1,6 @@
 import json
 from json import JSONDecodeError
-from typing import Any, Dict, Union, List
+from typing import Any, Dict, List
 
 from django.apps import apps
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
