@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.5.0](https://github.com/dldevinc/paper-streamfield/tree/v0.5.0) - 2023-04-26
+
+### ⚠ BREAKING CHANGES
+
+-   Added `StreamBlockMeta` class to provide metadata about a stream block in the stream.
+-   The `block_template` property of the block model has been removed and replaced with 
+    `stream_block_template` property of the `StreamBlockModelAdminMixin`.
+
 ## [0.4.0](https://github.com/dldevinc/paper-streamfield/tree/v0.4.0) - 2023-04-16
 
 ### ⚠ BREAKING CHANGES

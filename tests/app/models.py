@@ -13,11 +13,14 @@ class Page(models.Model):
     slug = models.SlugField(
         _("slug"),
     )
-    stream = StreamField(_("stream"), models=[
-        "blocks.HeaderBlock",
-        "blocks.ImageBlock",
-        "blocks.TextBlock",
-    ])
+    stream = StreamField(
+        _("stream"),
+        models=[
+            "blocks.HeaderBlock",
+            "blocks.ImageBlock",
+            "blocks.TextBlock",
+        ]
+    )
 
     class Meta:
         verbose_name = "Page"
