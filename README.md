@@ -213,3 +213,42 @@ You can access the parent context from the block template by using
 <!-- blocks/templates/blocks/textblock.html -->
 <div class="{{ parent_context.classes }}">{{ block.text|linebreaks }}</div>
 ```
+
+### Customize block in admin interface
+
+You can customize how a block is rendered in the admin interface
+by specifying `stream_block_template` field in the `StreamBlockModelAdmin`
+class:
+
+```python
+from django.contrib import admin
+from streamfield.admin import StreamBlockModelAdmin
+from .models import ImageBlock
+
+
+@admin.register(ImageBlock)
+class ImageBlockAdmin(StreamBlockModelAdmin):
+    stream_block_template = "blocks/admin/image.html"
+    list_display = ["__str__", "title", "alt"]
+```
+
+```html
+<!-- blocks/admin/image.html -->
+{% extends "streamfield/admin/block.html" %}
+
+{% block content %}
+   <div class="d-flex">
+      <div class="flex-grow-0 mr-2">
+         <img class="preview"
+              src="{{ instance.image }}"
+              width="48"
+              height="36"
+              title="{{ instance.title }}"
+              alt="{{ instance.alt }}"
+              style="object-fit: cover">
+      </div>
+   
+      {{ block.super }}
+   </div>
+{% endblock content %}
+```

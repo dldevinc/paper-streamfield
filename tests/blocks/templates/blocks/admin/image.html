@@ -2,16 +2,16 @@
 
 {% block content %}
   <div class="d-flex">
-    <div class="flex-grow-0">
+    <div class="flex-grow-0 mr-2">
       <img class="preview"
            src="{{ instance.image }}"
-           alt="{{ title }}"
            width="48"
            height="36"
+           title="{{ instance.title }}"
+           alt="{{ instance.alt }}"
            style="object-fit: cover">
     </div>
-    <div class="ml-2">
-      {{ block.super }}
-    </div>
+
+    {{ block.super }}
   </div>
 {% endblock content %}
