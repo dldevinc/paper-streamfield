@@ -33,7 +33,7 @@ class CacheRenderer(DefaultRenderer):
             # ...
 
             class StreamBlockMeta:
-                renderer = "streamfield.renderer.CacheRenderer"
+                renderer = "streamfield.renderers.CacheRenderer"
                 cache_backend = "redis"     # default: 'default'
                 cache_ttl = 1800            # default: 3600
     """

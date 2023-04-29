@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.db.models import Model
 from django.template import TemplateDoesNotExist
 
-from streamfield.renderer import CacheRenderer, DefaultRenderer
+from streamfield.renderers import CacheRenderer, DefaultRenderer
 
 DummyModel = Mock(spec=[])  # type: Union[Mock, Type[Model]]
 

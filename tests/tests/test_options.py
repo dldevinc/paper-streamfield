@@ -4,7 +4,7 @@ import pytest
 
 from streamfield import conf
 from streamfield.options import get_block_opts
-from streamfield.renderer import CacheRenderer, DefaultRenderer
+from streamfield.renderers import CacheRenderer, DefaultRenderer
 
 
 @pytest.mark.django_db
@@ -46,18 +46,18 @@ class TestOptions:
         assert opts.engine == "jinja2"
 
     def test_default_renderer(self):
-        assert conf.DEFAULT_RENDERER == "streamfield.renderer.DefaultRenderer"
+        assert conf.DEFAULT_RENDERER == "streamfield.renderers.DefaultRenderer"
         opts = get_block_opts(Mock(
             spec=["_meta"]
         ))
         assert isinstance(opts.renderer, DefaultRenderer)
 
     def test_custom_renderer(self):
-        assert conf.DEFAULT_RENDERER == "streamfield.renderer.DefaultRenderer"
+        assert conf.DEFAULT_RENDERER == "streamfield.renderers.DefaultRenderer"
         opts = get_block_opts(Mock(
             spec=["_meta", "StreamBlockMeta"],
             StreamBlockMeta=Mock(
-                renderer="streamfield.renderer.CacheRenderer"
+                renderer="streamfield.renderers.CacheRenderer"
             )
         ))
         assert isinstance(opts.renderer, CacheRenderer)

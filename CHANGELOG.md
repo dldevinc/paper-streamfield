@@ -7,6 +7,7 @@
 -   Added `StreamBlockMeta` class to provide metadata about a stream block.
 -   The `admin_block_template` property of the block model has been removed and replaced with 
     `stream_block_template` property of the corresponding `StreamBlockModelAdminMixin`.
+-   The `renderer` module was renamed to `renderers`.
 
 ## [0.4.0](https://github.com/dldevinc/paper-streamfield/tree/v0.4.0) - 2023-04-16
 
