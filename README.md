@@ -143,7 +143,7 @@ urlpatterns = patterns('',
    Now you can create some blocks:
    ![](https://user-images.githubusercontent.com/6928240/190414025-dfe364a9-524e-4529-835d-a3e507d1ee19.png)
 
-5. Use `render_stream` templatetag to render the stream field.
+5. Use `render_stream` template tag to render the stream field.
 
    ```html
    <!-- app/templates/index.html -->
@@ -167,11 +167,11 @@ with `StreamBlockMeta` class in your block model:
 
 ```python
 class HeadingBlock(models.Model):
-   # ...
+    # ...
 
-   class StreamBlockMeta:
-      engine = "jinja2"
-      template = "blocks/heading.html"
+    class StreamBlockMeta:
+        engine = "jinja2"
+        template = "blocks/heading.html"
 ```
 
 ### Add extra context
@@ -252,3 +252,30 @@ class ImageBlockAdmin(StreamBlockModelAdmin):
    </div>
 {% endblock content %}
 ```
+
+### Caching the rendered HTML of a block
+
+You can cache the rendered HTML of a block by using `CacheRenderer`
+class:
+
+```python
+class HeadingBlock(models.Model):
+    # ...
+
+    class StreamBlockMeta:
+        renderer = "streamfield.renderers.CacheRenderer"
+        cache_ttl = 3600
+```
+
+> Note that the specified block will **not** be invalidated 
+> when something changes in it.
+
+## Settings
+
+`PAPER_STREAMFIELD_DEFAULT_RENDERER`<br>
+Default renderer for `render_stream` template tag.<br>
+Default: `"streamfield.renderers.DefaultRenderer"`
+
+`PAPER_STREAMFIELD_DEFAULT_TEMPLATE_ENGINE`<br>
+Default template engine for `render_stream` template tag.<br>
+Default: `None`
