@@ -92,7 +92,8 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "KEY_PREFIX": "default"
+        "KEY_PREFIX": "default",
+        "TIMEOUT": 3600
     },
     "secondary": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",

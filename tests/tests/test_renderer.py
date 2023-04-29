@@ -1,11 +1,13 @@
+from datetime import datetime
 from typing import Type, Union
 from unittest.mock import Mock
 
 import pytest
+from django.core.cache import cache
 from django.db.models import Model
 from django.template import TemplateDoesNotExist
 
-from streamfield.renderer import DefaultRenderer, CacheRenderer
+from streamfield.renderer import CacheRenderer, DefaultRenderer
 
 DummyModel = Mock(spec=[])  # type: Union[Mock, Type[Model]]
 
@@ -91,7 +93,7 @@ class TestCacheRenderer:
         renderer = CacheRenderer()
         assert renderer.get_cache_ttl(Mock(
             spec=["_meta"]
-        )) == 3600
+        )) is None
 
     def test_custom_cache_ttl(self):
         renderer = CacheRenderer()
@@ -142,3 +144,25 @@ class TestCacheRenderer:
                 app_label="blocks",
             )
         )) == "<h3>Hello world</h3>"
+
+    def test_default_cache_timeout(self):
+        renderer = CacheRenderer()
+        block = Mock(
+            spec=["__class__", "pk", "rank", "text", "_meta"],
+            __class__=Mock(
+                __name__="HeaderBlock"
+            ),
+            pk=75,
+            rank="4",
+            text="Morning light",
+            _meta=Mock(
+                app_label="blocks",
+            )
+        )
+
+        assert renderer(block) == "<h4>Morning light</h4>"
+
+        # default cache timeout is 3600
+        cache_key = cache.make_key(renderer.get_cache_key(block))
+        ttl = datetime.fromtimestamp(cache._expire_info[cache_key]) - datetime.now()
+        assert 3595 <= ttl.seconds < 3600

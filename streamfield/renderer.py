@@ -67,7 +67,7 @@ class CacheRenderer(DefaultRenderer):
         **kwargs
     ) -> str:
         opts = get_block_opts(block)
-        return getattr(opts, "cache_ttl", 3600)
+        return getattr(opts, "cache_ttl", None)
 
     def __call__(
         self,
@@ -83,5 +83,10 @@ class CacheRenderer(DefaultRenderer):
             return cache.get(cache_key)
 
         content = super().__call__(block, request=request, **kwargs)
-        cache.set(cache_key, content, cache_ttl)
+
+        if cache_ttl is None:
+            cache.set(cache_key, content)
+        else:
+            cache.set(cache_key, content, cache_ttl)
+
         return content
