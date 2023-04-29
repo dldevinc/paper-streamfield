@@ -71,7 +71,7 @@ class TestCacheRenderer:
         assert renderer.get_cache(Mock(
             spec=["_meta", "StreamBlockMeta"],
             StreamBlockMeta=Mock(
-                cache_backend="secondary"
+                cache_alias="secondary"
             )
         )).key_prefix == "secondary"
 

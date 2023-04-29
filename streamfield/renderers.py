@@ -34,7 +34,7 @@ class CacheRenderer(DefaultRenderer):
 
             class StreamBlockMeta:
                 renderer = "streamfield.renderers.CacheRenderer"
-                cache_backend = "redis"     # default: 'default'
+                cache_alias = "redis"       # default: 'default'
                 cache_ttl = 1800            # default: 3600
     """
     @staticmethod
@@ -44,8 +44,8 @@ class CacheRenderer(DefaultRenderer):
         **kwargs
     ) -> BaseCache:
         opts = get_block_opts(block)
-        cache_backend = getattr(opts, "cache_backend", DEFAULT_CACHE_ALIAS)
-        return caches[cache_backend]
+        cache_alias = getattr(opts, "cache_alias", DEFAULT_CACHE_ALIAS)
+        return caches[cache_alias]
 
     @staticmethod
     def get_cache_key(
