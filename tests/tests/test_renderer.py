@@ -2,72 +2,143 @@ from typing import Type, Union
 from unittest.mock import Mock
 
 import pytest
-from blocks.models import HeaderBlock
 from django.db.models import Model
 from django.template import TemplateDoesNotExist
 
-from streamfield.renderer import render_template, resolve_template
+from streamfield.renderer import DefaultRenderer, CacheRenderer
 
 DummyModel = Mock(spec=[])  # type: Union[Mock, Type[Model]]
 
 
-def test_resolve_string_template():
-    template = resolve_template("blocks/header_block.html")
-    assert template.template.name == "blocks/header_block.html"
+class TestDefaultRenderer:
+    def test_missing_template(self):
+        renderer = DefaultRenderer()
+        with pytest.raises(TemplateDoesNotExist, match="app/headerblock.html, app/header_block.html"):
+            renderer(Mock(
+                spec=["__class__", "_meta"],
+                __class__=Mock(
+                    __name__="HeaderBlock"
+                ),
+                _meta=Mock(
+                    app_label="app",
+                )
+            ))
 
-
-def test_resolve_template_tuple():
-    template = resolve_template(
-        ("blocks/missing.html", "blocks/header_block.html")
-    )
-    assert template.template.name == "blocks/header_block.html"
-
-
-def test_resolve_missing_template():
-    with pytest.raises(TemplateDoesNotExist):
-        resolve_template("blocks/missing.html")
-
-
-def test_resolve_template_engine():
-    template = resolve_template("blocks/header_block.html", using=None)
-    assert template.backend.name == "jinja2"
-
-    template = resolve_template("blocks/header_block.html", using="django")
-    assert template.backend.name == "django"
-
-    template = resolve_template("blocks/header_block.html", using="jinja2")
-    assert template.backend.name == "jinja2"
-
-
-def test_render_template_content():
-    instance = HeaderBlock(text="Example header")
-    assert render_template(instance) == "<h1>Example header</h1>"
-
-
-def test_render_missing_template():
-    with pytest.raises(TemplateDoesNotExist, match="blocks/listblock.html, blocks/list_block.html"):
-        assert render_template(Mock(
-            spec=["title", "_meta", "__class__"],
+    def test_context(self):
+        renderer = DefaultRenderer()
+        block = Mock(
+            spec=["__class__", "rank", "text", "_meta"],
             __class__=Mock(
-                __name__="ListBlock"
+                __name__="HeaderBlock"
             ),
+            rank="2",
+            text="Hello world",
             _meta=Mock(
                 app_label="blocks",
+            )
+        )
+        assert renderer.get_context(block, classes="heading--level-1") == {
+            "block": block,
+            "classes": "heading--level-1"
+        }
+
+    def test_content(self):
+        renderer = DefaultRenderer()
+        assert renderer(Mock(
+            spec=["__class__", "rank", "text", "_meta"],
+            __class__=Mock(
+                __name__="HeaderBlock"
             ),
-            title="Example title"
-        ))
-
-
-def test_render_missing_custom_template():
-    with pytest.raises(TemplateDoesNotExist, match="blocks/missing.html"):
-        assert render_template(Mock(
-            spec=["StreamBlockMeta", "_meta"],
+            rank="2",
+            text="Hello world",
             _meta=Mock(
                 app_label="blocks",
-                model_name="headerblock",
-            ),
+            )
+        )) == "<h2>Hello world</h2>"
+
+
+class TestCacheRenderer:
+    def test_default_cache(self):
+        renderer = CacheRenderer()
+        assert renderer.get_cache(Mock(
+            spec=["_meta"]
+        )).key_prefix == "default"
+
+    def test_custom_cache(self):
+        renderer = CacheRenderer()
+        assert renderer.get_cache(Mock(
+            spec=["_meta", "StreamBlockMeta"],
             StreamBlockMeta=Mock(
-                template="blocks/missing.html",
-                engine=None
+                cache_backend="secondary"
+            )
+        )).key_prefix == "secondary"
+
+    def test_cache_key(self):
+        renderer = CacheRenderer()
+        block = Mock(
+            spec=["__class__", "pk", "_meta"],
+            __class__=Mock(
+                __name__="HeaderBlock"
             ),
-        ))
+            pk="54",
+            _meta=Mock(
+                app_label="blocks",
+            )
+        )
+        assert renderer.get_cache_key(block, classes="heading--level-1") == "blocks.HeaderBlock:54"
+
+    def test_default_cache_ttl(self):
+        renderer = CacheRenderer()
+        assert renderer.get_cache_ttl(Mock(
+            spec=["_meta"]
+        )) == 3600
+
+    def test_custom_cache_ttl(self):
+        renderer = CacheRenderer()
+        assert renderer.get_cache_ttl(Mock(
+            spec=["_meta", "StreamBlockMeta"],
+            StreamBlockMeta=Mock(
+                cache_ttl=1800
+            )
+        )) == 1800
+
+    def test_content(self):
+        renderer = CacheRenderer()
+        assert renderer(Mock(
+            spec=["__class__", "pk", "rank", "text", "_meta"],
+            __class__=Mock(
+                __name__="HeaderBlock"
+            ),
+            pk=42,
+            rank="2",
+            text="Hello world",
+            _meta=Mock(
+                app_label="blocks",
+            )
+        )) == "<h2>Hello world</h2>"
+
+    def test_actually_cached(self):
+        renderer = CacheRenderer()
+        assert renderer(Mock(
+            spec=["__class__", "pk", "rank", "text", "_meta"],
+            __class__=Mock(
+                __name__="HeaderBlock"
+            ),
+            pk=69,
+            rank="3",
+            text="Hello world",
+            _meta=Mock(
+                app_label="blocks",
+            )
+        )) == "<h3>Hello world</h3>"
+
+        assert renderer(Mock(
+            spec=["__class__", "pk", "_meta"],
+            __class__=Mock(
+                __name__="HeaderBlock"
+            ),
+            pk=69,
+            _meta=Mock(
+                app_label="blocks",
+            )
+        )) == "<h3>Hello world</h3>"

@@ -52,7 +52,7 @@ def from_dict(value: Dict[str, str]) -> BlockInstance:
     return model._base_manager.get(pk=value["pk"])
 
 
-def render(block: BlockInstance, extra_context: Dict = None, request: WSGIRequest = None) -> str:
+def render(block: BlockInstance, context: Dict = None, request: WSGIRequest = None) -> str:
     """
     Отрисовка экземпляра блока.
     """
@@ -66,4 +66,4 @@ def render(block: BlockInstance, extra_context: Dict = None, request: WSGIReques
     if isinstance(renderer, type):
         renderer = renderer()
 
-    return renderer(block, extra_context, request=request)
+    return renderer(block, request=request, **(context or {}))

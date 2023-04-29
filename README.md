@@ -42,118 +42,118 @@ urlpatterns = patterns('',
 
 1. Create some models that you want to use as blocks:
 
-```python
-# blocks/models.py
-
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
-from django.utils.text import Truncator
-
-
-class HeadingBlock(models.Model):
-    title = models.TextField()
-    rank = models.PositiveSmallIntegerField(
-        default=1,
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(6)
-        ]
-    )
-
-    class Meta:
-        verbose_name = "Heading"
-
-    def __str__(self):
-        return Truncator(self.title).chars(128)
-
-
-class TextBlock(models.Model):
-    text = models.TextField()
-
-    class Meta:
-        verbose_name = "Text"
-
-    def __str__(self):
-        return Truncator(self.text).chars(128)
-```
+   ```python
+   # blocks/models.py
+   
+   from django.core.validators import MaxValueValidator, MinValueValidator
+   from django.db import models
+   from django.utils.text import Truncator
+   
+   
+   class HeadingBlock(models.Model):
+       title = models.TextField()
+       rank = models.PositiveSmallIntegerField(
+           default=1,
+           validators=[
+               MinValueValidator(1),
+               MaxValueValidator(6)
+           ]
+       )
+   
+       class Meta:
+           verbose_name = "Heading"
+   
+       def __str__(self):
+           return Truncator(self.title).chars(128)
+   
+   
+   class TextBlock(models.Model):
+       text = models.TextField()
+   
+       class Meta:
+           verbose_name = "Text"
+   
+       def __str__(self):
+           return Truncator(self.text).chars(128)
+   ```
 
 2. Register your models using `StreamBlockModelAdmin` class.
 
-```python
-# blocks/admin.py
-
-from django.contrib import admin
-from streamfield.admin import StreamBlockModelAdmin
-from .models import HeadingBlock, TextBlock
-
-
-@admin.register(HeadingBlock)
-class HeadingBlockAdmin(StreamBlockModelAdmin):
-    list_display = ["__str__", "rank"]
-
-
-@admin.register(TextBlock)
-class TextBlockAdmin(StreamBlockModelAdmin):
-    pass
-```
+   ```python
+   # blocks/admin.py
+   
+   from django.contrib import admin
+   from streamfield.admin import StreamBlockModelAdmin
+   from .models import HeadingBlock, TextBlock
+   
+   
+   @admin.register(HeadingBlock)
+   class HeadingBlockAdmin(StreamBlockModelAdmin):
+       list_display = ["__str__", "rank"]
+   
+   
+   @admin.register(TextBlock)
+   class TextBlockAdmin(StreamBlockModelAdmin):
+       pass
+   ```
 
 3. Create templates for each block model, named as lowercase
    model name or _snake_cased_ model name.
 
-```html
-<!-- blocks/templates/blocks/headingblock.html -->
-<!-- or -->
-<!-- blocks/templates/blocks/heading_block.html -->
-<h{{ block.rank }}>{{ block.text }}</h{{ block.rank }}>
-```
-
-```html
-<!-- blocks/templates/blocks/textblock.html -->
-<!-- or -->
-<!-- blocks/templates/blocks/text_block.html -->
-<div>{{ block.text|linebreaks }}</div>
-```
+   ```html
+   <!-- blocks/templates/blocks/headingblock.html -->
+   <!-- or -->
+   <!-- blocks/templates/blocks/heading_block.html -->
+   <h{{ block.rank }}>{{ block.text }}</h{{ block.rank }}>
+   ```
+   
+   ```html
+   <!-- blocks/templates/blocks/textblock.html -->
+   <!-- or -->
+   <!-- blocks/templates/blocks/text_block.html -->
+   <div>{{ block.text|linebreaks }}</div>
+   ```
 
 4. Add `StreamField` to your model:
 
-```python
-# app/models.py
-
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from streamfield.field.models import StreamField
-
-
-class Page(models.Model):
-    stream = StreamField(
-       _("stream"), 
-       models=[
-           "blocks.HeaderBlock",
-           "blocks.TextBlock",
-       ]
-    )
-
-    class Meta:
-        verbose_name = "Page"
-```
-
-Result:
-![](https://user-images.githubusercontent.com/6928240/190413272-14b95712-de0f-4a9b-a815-40e3fb0a2d85.png)
-
-Now you can create some blocks:
-![](https://user-images.githubusercontent.com/6928240/190414025-dfe364a9-524e-4529-835d-a3e507d1ee19.png)
+   ```python
+   # app/models.py
+   
+   from django.db import models
+   from django.utils.translation import gettext_lazy as _
+   from streamfield.field.models import StreamField
+   
+   
+   class Page(models.Model):
+       stream = StreamField(
+          _("stream"), 
+          models=[
+              "blocks.HeaderBlock",
+              "blocks.TextBlock",
+          ]
+       )
+   
+       class Meta:
+           verbose_name = "Page"
+   ```
+   
+   Result:
+   ![](https://user-images.githubusercontent.com/6928240/190413272-14b95712-de0f-4a9b-a815-40e3fb0a2d85.png)
+   
+   Now you can create some blocks:
+   ![](https://user-images.githubusercontent.com/6928240/190414025-dfe364a9-524e-4529-835d-a3e507d1ee19.png)
 
 5. Use `render_stream` templatetag to render the stream field.
 
-```html
-<!-- app/templates/index.html -->
-{% load streamfield %}
-
-{% render_stream page.stream %}
-```
-
-Result:
-![](https://user-images.githubusercontent.com/6928240/190416377-e2ba504f-8aa0-44ed-b59d-0cf1ccea695e.png)
+   ```html
+   <!-- app/templates/index.html -->
+   {% load streamfield %}
+   
+   {% render_stream page.stream %}
+   ```
+   
+   Result:
+   ![](https://user-images.githubusercontent.com/6928240/190416377-e2ba504f-8aa0-44ed-b59d-0cf1ccea695e.png)
 
 ## Special cases
 
@@ -177,18 +177,18 @@ class HeadingBlock(models.Model):
 ### Add extra context
 
 You can add extra context to the template by passing
-additional keyword arguments to `render_stream` templatetag:
+additional keyword arguments to `render_stream` template tag:
+
+```html
+<!-- blocks/templates/blocks/textblock.html -->
+<div class="{{ classes }}">{{ block.text|linebreaks }}</div>
+```
 
 ```html
 <!-- app/templates/index.html -->
 {% load streamfield %}
 
 {% render_stream page.stream classes="text text--small" %}
-```
-
-```html
-<!-- blocks/templates/blocks/textblock.html -->
-<div class="{{ classes }}">{{ block.text|linebreaks }}</div>
 ```
 
 ### Access parent context from within a block
@@ -200,6 +200,11 @@ You can access the parent context from the block template by using
 `parent_context` variable:
 
 ```html
+<!-- blocks/templates/blocks/textblock.html -->
+<div class="{{ parent_context.classes }}">{{ block.text|linebreaks }}</div>
+```
+
+```html
 <!-- app/templates/index.html -->
 {% load streamfield %}
 
@@ -207,11 +212,6 @@ You can access the parent context from the block template by using
 {% with classes="text text--small" %}
   {% render_stream page.stream %}
 {% endwith %}
-```
-
-```html
-<!-- blocks/templates/blocks/textblock.html -->
-<div class="{{ parent_context.classes }}">{{ block.text|linebreaks }}</div>
 ```
 
 ### Customize block in admin interface

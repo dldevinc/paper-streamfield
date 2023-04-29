@@ -9,32 +9,31 @@ try:
 except ImportError:
     jinja2 = None
 
-
 register = Library()
 
 
 @register.simple_tag(name="render_stream", takes_context=True)
 def do_render_stream(context, stream: str, **kwargs):
     request = context.get("request", None)
-    context = {
+    context = dict(kwargs, **{
         "parent_context": context.flatten(),
-    }
-    context.update(kwargs)
+    })
     output = helpers.render_stream(stream, context, request=request)
     return mark_safe(output)
 
 
 if jinja2 is not None:
     class StreamFieldExtension(StandaloneTag):
+        safe_output = True
         tags = {"render_stream"}
 
         def render(self, stream: str, **kwargs):
             request = self.context.get("request", None)
-            context = {
+            context = dict(kwargs, **{
                 "parent_context": self.context,
-            }
-            context.update(kwargs)
+            })
             return helpers.render_stream(stream, context, request=request)
+
 
     # django-jinja support
     try:
