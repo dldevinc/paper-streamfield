@@ -36,7 +36,6 @@ class TextBlock(models.Model):
         verbose_name = "Text"
 
     class StreamBlockMeta:
-        engine = "django"
         template = "blocks/text.html"
 
     def __str__(self):

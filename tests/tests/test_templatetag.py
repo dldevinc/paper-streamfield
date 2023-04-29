@@ -1,9 +1,9 @@
 import pytest
+from blocks.models import TextBlock
+from django.template.backends.django import DjangoTemplates
 from jinja2 import Environment, FileSystemLoader
 
-from blocks.models import TextBlock
-
-from django.template.backends.django import DjangoTemplates
+from streamfield import conf
 from streamfield.templatetags.streamfield import StreamFieldExtension
 
 
@@ -45,8 +45,14 @@ class TestDjango:
             pk=1,
             text="Example text"
         )
+
+        assert conf.DEFAULT_TEMPLATE_ENGINE is None
+        conf.DEFAULT_TEMPLATE_ENGINE = "django"
+
         template = self.env.from_string("{% load streamfield %}<div>{% render_stream stream %}</div>")
         assert template.render({
             "theme": "new-year",
             "stream": '[{"uuid": "1234-5678", "model": "blocks.textblock", "pk": "1"}]'
         }) == "<div><div class=\"text--new-year\"><p>Example text</p></div></div>"
+
+        conf.DEFAULT_TEMPLATE_ENGINE = None
