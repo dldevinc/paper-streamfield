@@ -3,9 +3,8 @@ from uuid import uuid4
 
 from django.apps import apps
 from django.core.handlers.wsgi import WSGIRequest
-from django.utils.module_loading import import_string
 
-from . import conf
+from .options import get_block_opts
 from .typing import BlockInstance
 
 
@@ -56,14 +55,5 @@ def render(block: BlockInstance, context: Dict = None, request: WSGIRequest = No
     """
     Отрисовка экземпляра блока.
     """
-    renderer = getattr(block, "block_renderer", conf.DEFAULT_RENDERER)
-    if isinstance(renderer, str):
-        renderer_name = renderer
-        renderer = import_string(renderer_name)
-        if not callable(renderer):
-            raise ImportError("%s object is not callable" % renderer_name)
-
-    if isinstance(renderer, type):
-        renderer = renderer()
-
-    return renderer(block, request=request, **(context or {}))
+    opts = get_block_opts(block)
+    return opts.renderer(block, request=request, **(context or {}))
