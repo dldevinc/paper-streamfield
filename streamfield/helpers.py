@@ -8,7 +8,7 @@ from . import blocks, exceptions
 from .logging import logger
 
 
-def render_stream(stream: Union[str, List], extra_context: Dict = None, request: WSGIRequest = None) -> str:
+def render_stream(stream: Union[str, List], context: Dict = None, request: WSGIRequest = None) -> str:
     """
     Отрисовка всех блоков из JSON-массива.
     """
@@ -32,8 +32,8 @@ def render_stream(stream: Union[str, List], extra_context: Dict = None, request:
             output.append(
                 blocks.render(
                     block,
-                    extra_context=extra_context,
-                    request=request
+                    context or {},
+                    request=request,
                 )
             )
 
