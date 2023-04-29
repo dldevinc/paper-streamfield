@@ -26,6 +26,7 @@ def do_render_stream(context, stream: str, **kwargs):
 
 if jinja2 is not None:
     class StreamFieldExtension(StandaloneTag):
+        safe_output = True
         tags = {"render_stream"}
 
         def render(self, stream: str, **kwargs):
