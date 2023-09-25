@@ -12,7 +12,7 @@
            href="{{ model.url }}"
            id="{{ model.id }}"
            data-action="{{ model.action }}">
-          {{ model.title }}
+          {{ model.title|capfirst }}
         </a>
       </li>
     {% endfor %}
@@ -31,7 +31,7 @@
            href="{{ model.url }}"
            id="{{ model.id }}"
            data-action="{{ model.action }}">
-          {{ model.title }}
+          {{ model.title|capfirst }}
         </a>
       </li>
     {% endfor %}

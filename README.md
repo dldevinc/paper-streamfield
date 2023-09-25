@@ -51,7 +51,7 @@ urlpatterns = patterns('',
    
    
    class HeadingBlock(models.Model):
-       title = models.TextField()
+       text = models.TextField()
        rank = models.PositiveSmallIntegerField(
            default=1,
            validators=[
@@ -64,7 +64,7 @@ urlpatterns = patterns('',
            verbose_name = "Heading"
    
        def __str__(self):
-           return Truncator(self.title).chars(128)
+           return Truncator(self.text).chars(128)
    
    
    class TextBlock(models.Model):
@@ -114,7 +114,7 @@ urlpatterns = patterns('',
    <div>{{ block.text|linebreaks }}</div>
    ```
 
-4. Add `StreamField` to your model:
+4. Add a `StreamField` to your model:
 
    ```python
    # app/models.py
