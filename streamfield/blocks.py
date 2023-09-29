@@ -56,4 +56,4 @@ def render(block: BlockInstance, context: Dict = None, request: WSGIRequest = No
     Отрисовка экземпляра блока.
     """
     opts = get_block_opts(block)
-    return opts.renderer(block, request=request, **(context or {}))
+    return opts.renderer(block, context, request=request)

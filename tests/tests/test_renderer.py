@@ -4,7 +4,7 @@ from typing import Type, Union
 import pytest
 from django.core.cache import cache
 from django.db.models import Model
-from django.template import TemplateDoesNotExist
+from django.template.exceptions import TemplateDoesNotExist
 
 from streamfield.renderers import CacheRenderer, DefaultRenderer
 
@@ -41,7 +41,9 @@ class TestDefaultRenderer:
                 app_label="blocks",
             )
         )
-        assert renderer.get_context(block, classes="heading--level-1") == {
+        assert renderer.make_context({
+            "classes": "heading--level-1"
+        }, block) == {
             "block": block,
             "classes": "heading--level-1"
         }
@@ -90,7 +92,9 @@ class TestCacheRenderer:
                 app_label="blocks",
             )
         )
-        assert renderer.get_cache_key(block, classes="heading--level-1") == "blocks.HeaderBlock:54"
+        assert renderer.get_cache_key(block, {
+            "classes": "heading--level-1"
+        }) == "blocks.HeaderBlock:54"
 
     def test_default_cache_ttl(self):
         renderer = CacheRenderer()

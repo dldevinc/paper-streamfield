@@ -30,11 +30,7 @@ def render_stream(stream: Union[str, List], context: Dict = None, request: WSGIR
             continue
         else:
             output.append(
-                blocks.render(
-                    block,
-                    context or {},
-                    request=request,
-                )
+                blocks.render(block, context, request=request)
             )
 
     return "\n".join(output)

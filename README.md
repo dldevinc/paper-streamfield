@@ -180,39 +180,45 @@ You can add extra context to the template by passing
 additional keyword arguments to `render_stream` template tag:
 
 ```html
-<!-- blocks/templates/blocks/textblock.html -->
-<div class="{{ classes }}">{{ block.text|linebreaks }}</div>
-```
-
-```html
 <!-- app/templates/index.html -->
 {% load streamfield %}
 
 {% render_stream page.stream classes="text text--small" %}
 ```
 
-### Access parent context from within a block
-
-In some cases you need to access the parent context from the block
-template.
-
-You can access the parent context from the block template by using
-`parent_context` variable:
-
 ```html
 <!-- blocks/templates/blocks/textblock.html -->
-<div class="{{ parent_context.classes }}">{{ block.text|linebreaks }}</div>
+<div class="{{ classes }}">{{ block.text|linebreaks }}</div>
 ```
 
-```html
-<!-- app/templates/index.html -->
-{% load streamfield %}
+### Access parent context from within a block
 
-<!-- Add classes to the page context -->
-{% with classes="text text--small" %}
-  {% render_stream page.stream %}
-{% endwith %}
-```
+In `paper-streamfield` you can use variables from the parent context within block 
+templates (similar to how it's done with the `{% include %}` tag in Django templates).
+
+1. **Pass Variables in Parent Template**: In your parent template, define variables 
+   you want to use in block templates. For example:
+
+   ```html
+   <!-- app/templates/index.html -->
+   {% load streamfield %}
+   
+   <!-- Add classes to the page context -->
+   {% with theme="dark" %}
+     {% render_stream page.stream %}
+   {% endwith %}
+   ```
+
+2. **Access Variables in Block Templates**: In your block templates, you can access 
+   variables from the parent context just like regular Django templates:
+
+   ```html
+   <!-- blocks/templates/blocks/textblock.html -->
+   <div class="block{% if theme %} block--{{ theme }}{% endif %}">{{ block.text|linebreaks }}</div>
+   ```
+
+With this approach, you can utilize variables from the parent context within block 
+templates, making it easy to customize block rendering in your Django project.
 
 ### Customize block in admin interface
 

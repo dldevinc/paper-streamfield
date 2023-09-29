@@ -14,11 +14,8 @@ register = Library()
 
 @register.simple_tag(name="render_stream", takes_context=True)
 def do_render_stream(context, stream: str, **kwargs):
-    request = context.get("request", None)
-    context = dict(kwargs, **{
-        "parent_context": context.flatten(),
-    })
-    output = helpers.render_stream(stream, context, request=request)
+    ctx_dict = context.push(kwargs)
+    output = helpers.render_stream(stream, ctx_dict.context.flatten())
     return mark_safe(output)
 
 
@@ -28,11 +25,9 @@ if jinja2 is not None:
         tags = {"render_stream"}
 
         def render(self, stream: str, **kwargs):
-            request = self.context.get("request", None)
-            context = dict(kwargs, **{
-                "parent_context": self.context,
-            })
-            return helpers.render_stream(stream, context, request=request)
+            context_vars = self.context.get_all()
+            context_vars.update(kwargs)
+            return helpers.render_stream(stream, context_vars)
 
 
     # django-jinja support
