@@ -92,6 +92,7 @@ class RenderStreamView(AdminStreamViewMixin, View):
             "uuid": record["uuid"],
             "instance": block,
             "opts": block._meta,
+            "visible": record.get("visible", True),
             "has_change_permission": model_admin.has_change_permission(self.request, block) if model_admin is not None else False,
             "has_view_permission": model_admin.has_view_permission(self.request, block) if model_admin is not None else False,
         }, request=self.request)
@@ -101,6 +102,7 @@ class RenderStreamView(AdminStreamViewMixin, View):
             "uuid": record.get("uuid", ""),
             "model": record.get("model", "undefined"),
             "pk": record.get("pk", "undefined"),
+            "visible": True,
             "reason": reason,
         }, request=self.request)
 

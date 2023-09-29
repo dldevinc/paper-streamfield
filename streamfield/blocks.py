@@ -21,7 +21,8 @@ def to_dict(instance: BlockInstance) -> Dict[str, str]:
     return {
         "uuid": str(uuid4()),
         "model": f"{opts.app_label}.{opts.model_name}",
-        "pk": str(instance.pk)
+        "pk": str(instance.pk),
+        "visible": True
     }
 
 

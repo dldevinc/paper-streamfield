@@ -20,7 +20,8 @@ class TestToDict:
 
         assert data == {
             "model": "blocks.headerblock",
-            "pk": "1"
+            "pk": "1",
+            "visible": True
         }
 
 
@@ -30,20 +31,23 @@ class TestIsValid:
             "uuid": "1234-5678",
             "model": "blocks.header",
             "pk": "1",
+            "visible": True
         }) is True
 
     def test_missing_required_key(self):
         assert blocks.is_valid({
             "uuid": "123",
             "model": "blocks.header",
-            "id": "6"
+            "id": "6",  # <---
+            "visible": True
         }) is False
 
-    def test_non_string_values(self):
+    def test_non_string_required_values(self):
         assert blocks.is_valid({
             "uuid": "1234-5678",
             "model": "blocks.header",
-            "pk": 1,
+            "pk": 1,  # <---
+            "visible": True
         }) is False
 
         assert blocks.is_valid({
@@ -51,6 +55,7 @@ class TestIsValid:
             "model": "blocks.header",
             "pk": "1",
             "non-required-key": 42,  # allowed
+            "visible": True
         }) is True
 
 

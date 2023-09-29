@@ -7,6 +7,10 @@
 -   Parent context now inherits automatically in block templates. The `parent_context` 
     variable has been removed.
 
+### Features
+
+-   Added the ability to hide certain blocks. 
+
 ## [0.5.0](https://github.com/dldevinc/paper-streamfield/tree/v0.5.0) - 2023-06-01
 
 ### ⚠ BREAKING CHANGES

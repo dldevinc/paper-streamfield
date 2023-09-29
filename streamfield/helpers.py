@@ -23,6 +23,10 @@ def render_stream(stream: Union[str, List], context: Dict = None, request: WSGIR
         if not blocks.is_valid(record):
             raise exceptions.InvalidStreamBlockError(record)
 
+        visible = record.get("visible", True)
+        if not visible:
+            continue
+
         try:
             block = blocks.from_dict(record)
         except (LookupError, ObjectDoesNotExist, MultipleObjectsReturned):

@@ -92,8 +92,16 @@
 
   &__block-tools {
     margin-left: auto;
+    display: flex;
+    align-items: center;
     padding: 3px 0;
     flex: 0 0 auto;
+    gap: 0.7rem;
+  }
+
+  &__visibility-switch {
+    transform: scale(0.85);
+    transform-origin: center right;
   }
 
   // ============
@@ -134,6 +142,14 @@
   // ============
   //   States
   // ============
+
+  &--hidden {
+    background-color: #f2f2f2;
+  }
+
+  &--hidden &__content {
+    opacity: 0.6;
+  }
 
   &--loading &__container {
     position: relative;
