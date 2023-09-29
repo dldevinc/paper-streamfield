@@ -21,6 +21,7 @@ class StreamField {
         block: "stream-field__block",
         buttons: "stream-field__buttons",
         sortableHandler: "stream-field__sortable-handler",
+        visibilitySwitch: "stream-field__visibility-switch",
         changeBlockButton: "stream-field__change-btn",
         deleteBlockButton: "stream-field__delete-btn",
         dropdownItemButton: "stream-field__dropdown-item" // create or lookup block
@@ -130,6 +131,12 @@ class StreamField {
         const processedValue = this.value.map(record => {
             let uuid = record["uuid"];
             if (typeof uuid === "string" && uuid_validate(uuid)) {
+                // Add visibility field for data created
+                // with `paper-streamfield` <= 0.6.0
+                if (!record.hasOwnProperty("visible")) {
+                    record.visible = true;
+                }
+
                 return (result[uuid] = record);
             } else {
                 hasBadBlocks = true;
@@ -170,6 +177,21 @@ class StreamField {
     }
 
     _addListeners() {
+        this.field.addEventListener("change", event => {
+            const visibilitySwitch = event.target.closest(`.${this.CSS.visibilitySwitch}`);
+            if (visibilitySwitch) {
+                visibilitySwitch.disabled = true;
+                const blockElement = visibilitySwitch.closest(`.${this.CSS.block}`);
+                const uuid = blockElement.dataset.uuid;
+                const block = this.getBlockByUUID(uuid);
+                const input = visibilitySwitch.querySelector("input");
+                const state = Boolean(input && input.checked);
+                block.visible = state;
+                blockElement.classList.toggle("stream-field--hidden", !state);
+                this.save();
+            }
+        });
+
         this.field.addEventListener("click", event => {
             const deleteButton = event.target.closest(`.${this.CSS.deleteBlockButton}`);
             if (deleteButton) {
@@ -369,7 +391,8 @@ function dismissAddStreamBlockPopup(win, newId) {
         streamField._appendBlock({
             model: `${match[2]}.${match[3]}`,
             pk: newId,
-            uuid: uuid4()
+            uuid: uuid4(),
+            visible: true
         });
 
         streamField.wrapPreloader(streamField.updateBlocks());
@@ -430,7 +453,8 @@ function dismissLookupStreamBlockPopup(originalFunc) {
             streamField._appendBlock({
                 model: `${match[2]}.${match[3]}`,
                 pk: chosenId,
-                uuid: uuid4()
+                uuid: uuid4(),
+                visible: true
             });
 
             streamField.wrapPreloader(streamField.updateBlocks());

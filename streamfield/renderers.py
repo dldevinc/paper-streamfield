@@ -1,3 +1,6 @@
+import warnings
+from typing import Optional
+
 from django.core.cache import DEFAULT_CACHE_ALIAS, BaseCache, caches
 from django.core.handlers.wsgi import WSGIRequest
 from django.template.loader import render_to_string
@@ -7,22 +10,29 @@ from .typing import BlockInstance
 
 
 class DefaultRenderer:
-    @staticmethod
-    def get_context(block: BlockInstance, **kwargs):
-        context = {
+    @classmethod
+    def get_context(cls, block: BlockInstance, **kwargs):
+        warnings.warn(
+            "get_context() is deprecated in favor of 'make_context'",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return cls.make_context(kwargs, block)
+
+    @classmethod
+    def make_context(cls, context: Optional[dict], block: BlockInstance) -> dict:
+        return dict(context or {}, **{
             "block": block,
-        }
-        context.update(kwargs)
-        return context
+        })
 
     def __call__(
         self,
         block: BlockInstance,
-        request: WSGIRequest = None,
-        **kwargs
+        context: dict = None,
+        request: WSGIRequest = None
     ) -> str:
         opts = get_block_opts(block)
-        context = self.get_context(block, **kwargs)
+        context = self.make_context(context, block)
         return render_to_string(opts.template, context, request=request, using=opts.engine)
 
 
@@ -40,8 +50,8 @@ class CacheRenderer(DefaultRenderer):
     @staticmethod
     def get_cache(
         block: BlockInstance,
-        request: WSGIRequest = None,
-        **kwargs
+        context: dict = None,
+        request: WSGIRequest = None
     ) -> BaseCache:
         opts = get_block_opts(block)
         cache_alias = getattr(opts, "cache_alias", DEFAULT_CACHE_ALIAS)
@@ -50,8 +60,8 @@ class CacheRenderer(DefaultRenderer):
     @staticmethod
     def get_cache_key(
         block: BlockInstance,
-        request: WSGIRequest = None,
-        **kwargs
+        context: dict = None,
+        request: WSGIRequest = None
     ) -> str:
         opts = get_block_opts(block)
         return "{}.{}:{}".format(
@@ -63,8 +73,8 @@ class CacheRenderer(DefaultRenderer):
     @staticmethod
     def get_cache_ttl(
         block: BlockInstance,
-        request: WSGIRequest = None,
-        **kwargs
+        context: dict = None,
+        request: WSGIRequest = None
     ) -> str:
         opts = get_block_opts(block)
         return getattr(opts, "cache_ttl", None)
@@ -72,17 +82,20 @@ class CacheRenderer(DefaultRenderer):
     def __call__(
         self,
         block: BlockInstance,
-        request: WSGIRequest = None,
-        **kwargs
+        context: dict = None,
+        request: WSGIRequest = None
     ) -> str:
-        cache = self.get_cache(block, request=request, **kwargs)
-        cache_key = self.get_cache_key(block, request=request, **kwargs)
-        cache_ttl = self.get_cache_ttl(block, request=request, **kwargs)
+        opts = get_block_opts(block)
+        context = self.make_context(context, block)
+
+        cache = self.get_cache(block, context, request=request)
+        cache_key = self.get_cache_key(block, context, request=request)
+        cache_ttl = self.get_cache_ttl(block, context, request=request)
 
         if cache_key in cache:
             return cache.get(cache_key)
 
-        content = super().__call__(block, request=request, **kwargs)
+        content = render_to_string(opts.template, context, request=request, using=opts.engine)
 
         if cache_ttl is None:
             cache.set(cache_key, content)

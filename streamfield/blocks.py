@@ -21,7 +21,8 @@ def to_dict(instance: BlockInstance) -> Dict[str, str]:
     return {
         "uuid": str(uuid4()),
         "model": f"{opts.app_label}.{opts.model_name}",
-        "pk": str(instance.pk)
+        "pk": str(instance.pk),
+        "visible": True
     }
 
 
@@ -56,4 +57,4 @@ def render(block: BlockInstance, context: Dict = None, request: WSGIRequest = No
     Отрисовка экземпляра блока.
     """
     opts = get_block_opts(block)
-    return opts.renderer(block, request=request, **(context or {}))
+    return opts.renderer(block, context, request=request)

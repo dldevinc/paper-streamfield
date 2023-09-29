@@ -87,3 +87,37 @@ class TestRenderStream:
 
         output = helpers.render_stream(stream)
         assert output == "<h1>Example header</h1>"
+
+    def test_visibility(self):
+        HeaderBlock.objects.create(
+            pk=1,
+            text="Example header"
+        )
+        TextBlock.objects.create(
+            pk=1,
+            text="Example text"
+        )
+        TextBlock.objects.create(
+            pk=2,
+            text="Another text"
+        )
+
+        stream = [{
+            "uuid": str(uuid4()),
+            "model": "blocks.headerblock",
+            "pk": "1",
+            "visible": True
+        }, {
+            "uuid": str(uuid4()),
+            "model": "blocks.textblock",
+            "pk": "1",
+            "visible": False
+        }, {
+            "uuid": str(uuid4()),
+            "model": "blocks.textblock",
+            "pk": "2",
+            "visible": True
+        }]
+
+        output = helpers.render_stream(stream)
+        assert output == "<h1>Example header</h1>\n<div><p>Another text</p></div>"
