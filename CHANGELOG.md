@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.6.0](https://github.com/dldevinc/paper-streamfield/tree/v0.6.0) - 2023-09-29
+
+### ⚠ BREAKING CHANGES
+
+-   Parent context now inherits automatically in block templates. The `parent_context` 
+    variable has been removed.
+
 ## [0.5.0](https://github.com/dldevinc/paper-streamfield/tree/v0.5.0) - 2023-06-01
 
 ### ⚠ BREAKING CHANGES
