@@ -159,9 +159,6 @@ urlpatterns = patterns('',
 
 ### Use custom template name or template engine
 
-If you need to use custom template name or template engine, you can
-specify 
-
 You can specify a template name or engine to render a specific block 
 with `StreamBlockMeta` class in your block model:
 
