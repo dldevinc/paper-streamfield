@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.6.1](https://github.com/dldevinc/paper-streamfield/tree/v0.6.1) - 2023-10-04
+
+### Bug fixes
+
+-   Use plural model name in lookup dropdown.
+
 ## [0.6.0](https://github.com/dldevinc/paper-streamfield/tree/v0.6.0) - 2023-09-29
 
 ### ⚠ BREAKING CHANGES
