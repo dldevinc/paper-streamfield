@@ -152,7 +152,7 @@ class RenderButtonsView(AdminStreamViewMixin, View):
             if has_change_permission or has_view_permission:
                 searchable_models.append({
                     "id": "lookup_%s--%s.%s" % (field_id, info[0], info[1]),
-                    "title": model._meta.verbose_name,
+                    "title": model._meta.verbose_name_plural,
                     "url": reverse("admin:%s_%s_changelist" % info),
                     "action": "lookup",
                 })
