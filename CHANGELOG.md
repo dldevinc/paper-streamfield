@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.7.0](https://github.com/dldevinc/paper-streamfield/tree/v0.7.0) - 2023-10-16
+
+### ⚠ BREAKING CHANGES
+
+-   Complete rewrite of block rendering logic.
+
 ## [0.6.1](https://github.com/dldevinc/paper-streamfield/tree/v0.6.1) - 2023-10-04
 
 ### Bug fixes
