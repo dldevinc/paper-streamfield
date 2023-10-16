@@ -75,9 +75,16 @@ class RenderStreamView(AdminStreamViewMixin, View):
             return self.block_invalid(record, _("The specified class is not allowed here"))
 
         try:
-            block = blocks.from_dict(record)
+            model = blocks.get_model(record)
         except LookupError:
             return self.block_invalid(record, _("Model not found"))
+
+        processor = blocks.get_processor(model)
+        queryset = processor.get_queryset()
+        pk = model._meta.pk.get_prep_value(record["pk"])
+
+        try:
+            block = queryset.get(pk=pk)
         except ObjectDoesNotExist:
             return self.block_invalid(record, _("Instance not found"))
         except MultipleObjectsReturned:

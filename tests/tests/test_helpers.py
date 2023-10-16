@@ -121,3 +121,32 @@ class TestRenderStream:
 
         output = helpers.render_stream(stream)
         assert output == "<h1>Example header</h1>\n<div><p>Another text</p></div>"
+
+
+@pytest.mark.django_db
+class TestRenderBlock:
+    def test_rendering(self):
+        HeaderBlock.objects.create(
+            pk=1,
+            text="Example header"
+        )
+
+        output = helpers.render_block({
+            "model": "blocks.HeaderBlock",
+            "pk": 1
+        })
+        assert output == "<h1>Example header</h1>"
+
+    def test_parent_context(self):
+        TextBlock.objects.create(
+            pk=1,
+            text="Dark text"
+        )
+
+        output = helpers.render_block({
+            "model": "blocks.TextBlock",
+            "pk": 1
+        }, {
+            "theme": "dark"
+        })
+        assert output == '<div class="text--dark"><p>Dark text</p></div>'

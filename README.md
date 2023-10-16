@@ -155,6 +155,10 @@ urlpatterns = patterns('',
    Result:
    ![](https://user-images.githubusercontent.com/6928240/190416377-e2ba504f-8aa0-44ed-b59d-0cf1ccea695e.png)
 
+
+> When working with block templates, it's important to note that 
+> you have access to all variables from the parent context.
+
 ## Special cases
 
 ### Use custom template name or template engine
@@ -167,14 +171,35 @@ class HeadingBlock(models.Model):
     # ...
 
     class StreamBlockMeta:
-        engine = "jinja2"
-        template = "blocks/heading.html"
+        template_engine = "jinja2"
+        template_name = "blocks/heading.html"
 ```
 
-### Add extra context
+### Caching the rendered HTML of a block
 
-You can add extra context to the template by passing
-additional keyword arguments to `render_stream` template tag:
+You can enable caching for specific blocks to optimize rendering.
+
+```python
+class HeadingBlock(models.Model):
+    # ...
+
+    class StreamBlockMeta:
+        cache = True
+        cache_ttl = 3600
+```
+
+Once caching is enabled for the block, the rendered HTML will be stored 
+in cache, and subsequent requests will retrieve the cached content, 
+reducing the need for re-rendering.
+
+> Note that the specified block will **not** be invalidated
+> when something changes in it.
+
+### Adding context variables to all blocks
+
+You can add context variables to all blocks in your StreamField by providing them 
+through the `render_stream` template tag. This allows you to pass common context data 
+to customize the rendering of all content blocks consistently:
 
 ```html
 <!-- app/templates/index.html -->
@@ -188,34 +213,32 @@ additional keyword arguments to `render_stream` template tag:
 <div class="{{ classes }}">{{ block.text|linebreaks }}</div>
 ```
 
-### Access parent context from within a block
+### Adding context variables to a specific block
 
-In `paper-streamfield` you can use variables from the parent context within block 
-templates (similar to how it's done with the `{% include %}` tag in Django templates).
+To add context variables to a specific content block, 
+you must create a custom processor. A processor provides a mechanism for 
+customizing the context data and the rendering process of an individual block.
 
-1. **Pass Variables in Parent Template**: In your parent template, define variables 
-   you want to use in block templates. For example:
+1. Create a custom processor class that inherits from 
+   `streamfield.processors.DefaultProcessor`.
+   ```python
+   from streamfield.processors import DefaultProcessor
+   from reviews.models import Review
 
-   ```html
-   <!-- app/templates/index.html -->
-   {% load streamfield %}
-   
-   <!-- Add classes to the page context -->
-   {% with theme="dark" %}
-     {% render_stream page.stream %}
-   {% endwith %}
+   class ReviewsBlockProcessor(DefaultProcessor):
+       def get_context(self, block):
+           context = super().get_context(block)
+           context["reviews"] = Review.objects.all()[:5]
+           return context
    ```
-
-2. **Access Variables in Block Templates**: In your block templates, you can access 
-   variables from the parent context just like regular Django templates:
-
-   ```html
-   <!-- blocks/templates/blocks/textblock.html -->
-   <div class="block{% if theme %} block--{{ theme }}{% endif %}">{{ block.text|linebreaks }}</div>
+2. In your block's model, specify the processor to use:
+   ```python
+   class ReviewsBlock(models.Model):
+       # ...
+    
+       class StreamBlockMeta:
+           processor = "your_app.processors.ReviewsBlockProcessor"
    ```
-
-With this approach, you can utilize variables from the parent context within block 
-templates, making it easy to customize block rendering in your Django project.
 
 ### Customize block in admin interface
 
@@ -256,28 +279,11 @@ class ImageBlockAdmin(StreamBlockModelAdmin):
 {% endblock content %}
 ```
 
-### Caching the rendered HTML of a block
-
-You can cache the rendered HTML of a block by using `CacheRenderer`
-class:
-
-```python
-class HeadingBlock(models.Model):
-    # ...
-
-    class StreamBlockMeta:
-        renderer = "streamfield.renderers.CacheRenderer"
-        cache_ttl = 3600
-```
-
-> Note that the specified block will **not** be invalidated 
-> when something changes in it.
-
 ## Settings
 
-`PAPER_STREAMFIELD_DEFAULT_RENDERER`<br>
-Default renderer for `render_stream` template tag.<br>
-Default: `"streamfield.renderers.DefaultRenderer"`
+`PAPER_STREAMFIELD_DEFAULT_PROCESSOR`<br>
+Default processor for content blocks.<br>
+Default: `"streamfield.processors.DefaultProcessor"`
 
 `PAPER_STREAMFIELD_DEFAULT_TEMPLATE_ENGINE`<br>
 Default template engine for `render_stream` template tag.<br>

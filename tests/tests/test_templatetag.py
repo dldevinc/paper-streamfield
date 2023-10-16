@@ -33,7 +33,10 @@ class TestJinja2:
                       '{"uuid": "1234-5678", "model": "blocks.headerblock", "pk": "1"},'
                       '{"uuid": "1234-5679", "model": "blocks.textblock", "pk": "1"}'
                       ']'
-        }) == "<div><h3>Example header</h3>\n<div class=\"text--new-year\"><p>Example text</p></div></div>"
+        }) == ("<div>"
+               "<h3 class=\"header--new-year\">Example header</h3>\n"
+               "<div class=\"text--new-year\"><p>Example text</p></div>"
+               "</div>")
 
 
 @pytest.mark.django_db
@@ -69,6 +72,9 @@ class TestDjango:
                       '{"uuid": "1234-5678", "model": "blocks.headerblock", "pk": "1"},'
                       '{"uuid": "1234-5679", "model": "blocks.textblock", "pk": "1"}'
                       ']'
-        }) == "<div><h3>Example header</h3>\n<div class=\"text--new-year\"><p>Example text</p></div></div>"
+        }) == ("<div>"
+               "<h3 class=\"header--new-year\">Example header</h3>\n"
+               "<div class=\"text--new-year\"><p>Example text</p></div>"
+               "</div>")
 
         conf.DEFAULT_TEMPLATE_ENGINE = None

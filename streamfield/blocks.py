@@ -2,10 +2,12 @@ from typing import Dict
 from uuid import uuid4
 
 from django.apps import apps
-from django.core.handlers.wsgi import WSGIRequest
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import import_string
 
-from .options import get_block_opts
-from .typing import BlockInstance
+from .conf import DEFAULT_PROCESSOR
+from .processors import BaseProcessor
+from .typing import BlockInstance, BlockModel
 
 
 def to_dict(instance: BlockInstance) -> Dict[str, str]:
@@ -43,18 +45,32 @@ def is_valid(value: Dict[str, str]) -> bool:
     return True
 
 
-def from_dict(value: Dict[str, str]) -> BlockInstance:
+def get_model(value: Dict[str, str]) -> BlockModel:
     """
-    Возвращает экземпляр блока из словаря,
+    Возвращает класс модели блока из словаря,
     созданного с помощью функции `to_dict()`.
     """
-    model = apps.get_model(value["model"])
-    return model._base_manager.get(pk=value["pk"])
+    return apps.get_model(value["model"])
 
 
-def render(block: BlockInstance, context: Dict = None, request: WSGIRequest = None) -> str:
+def get_processor(model: BlockModel) -> BaseProcessor:
     """
-    Отрисовка экземпляра блока.
+    Возвращает экземпляр обработчика для указанной модели.
     """
-    opts = get_block_opts(block)
-    return opts.renderer(block, context, request=request)
+    stream_meta = getattr(model, "StreamBlockMeta", None)
+    if stream_meta is not None:
+        processor = getattr(stream_meta, "processor", None) or DEFAULT_PROCESSOR
+    else:
+        processor = DEFAULT_PROCESSOR
+
+    if isinstance(processor, str):
+        processor = import_string(processor)
+
+    if not isinstance(processor, type):
+        raise ImproperlyConfigured("StreamBlock processor is not a class: %r" % processor)
+
+    return processor(
+        app_label=model._meta.app_label,
+        model_name=model.__name__,
+        **(stream_meta.__dict__ if stream_meta is not None else {})
+    )
