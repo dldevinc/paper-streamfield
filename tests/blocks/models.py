@@ -3,6 +3,8 @@ from django.db import models
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
+__all__ = ["HeaderBlock", "TextBlock", "ImageBlock", "QuoteBlock"]
+
 
 class HeaderBlock(models.Model):
     text = models.TextField(
@@ -36,7 +38,7 @@ class TextBlock(models.Model):
         verbose_name = "Text"
 
     class StreamBlockMeta:
-        template = "blocks/text.html"
+        template_name = "blocks/text.html"
 
     def __str__(self):
         return Truncator(self.text).chars(96)

@@ -1,9 +1,10 @@
 import pytest
-from django.core.exceptions import ObjectDoesNotExist
-
-from blocks.models import HeaderBlock
+from blocks.models import *
 
 from streamfield import blocks
+from streamfield.processors import DefaultProcessor
+
+from .mock import get_mock
 
 
 class TestToDict:
@@ -59,38 +60,25 @@ class TestIsValid:
         }) is True
 
 
-@pytest.mark.django_db
-class TestFromDict:
+class TestGetModel:
+    def test_valid_model(self):
+        assert blocks.get_model({
+            "model": "blocks.headerblock",
+        }) is HeaderBlock
+
     def test_invalid_model(self):
         with pytest.raises(LookupError):
-            blocks.from_dict({
+            blocks.get_model({
                 "model": "unknown.headerblock",
                 "pk": "1"
             })
 
-    def test_object_does_not_exists(self):
-        with pytest.raises(ObjectDoesNotExist):
-            blocks.from_dict({
-                "model": "blocks.headerblock",
-                "pk": "1"
-            })
 
-    def test_valid(self):
-        HeaderBlock.objects.create(
-            pk=1,
-            text="Example header"
-        )
+class TestGetProcessor:
+    def test_default_processor(self):
+        processor = blocks.get_processor(HeaderBlock)
+        assert isinstance(processor, DefaultProcessor)
 
-        block = blocks.from_dict({
-            "model": "blocks.headerblock",
-            "pk": "1"
-        })
-        assert block is not None
-
-
-class TestRender:
-    def test_header(self):
-        block = HeaderBlock(
-            text="Example header"
-        )
-        assert blocks.render(block) == "<h1>Example header</h1>"
+    def test_processor_options(self):
+        processor = blocks.get_processor(TextBlock)
+        assert processor.get_template_names(get_mock()) == "blocks/text.html"
