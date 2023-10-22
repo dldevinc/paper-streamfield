@@ -8,7 +8,7 @@
   {% block content %}
     <div class="stream-field__content">
       <p class="stream-field__title">{{ instance }}</p>
-      <p class="stream-field__type">{{ opts.verbose_name }}</p>
+      <p class="stream-field__type">{{ opts.verbose_name|capfirst }}</p>
     </div>
   {% endblock content %}
 

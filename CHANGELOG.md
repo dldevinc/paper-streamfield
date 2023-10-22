@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.7.1](https://github.com/dldevinc/paper-streamfield/tree/v0.7.1) - 2023-10-22
+
+### Bug fixes
+
+-   The 'verbose_name' of all blocks now starts with a capital letter.
+
 ## [0.7.0](https://github.com/dldevinc/paper-streamfield/tree/v0.7.0) - 2023-10-16
 
 ### ⚠ BREAKING CHANGES
