@@ -6,6 +6,10 @@
 
 -   Added the `render_block` template tag.
 
+### Bug fixes
+
+-   Fixed an issue when admin popups not closing automatically. 
+
 ## [0.7.1](https://github.com/dldevinc/paper-streamfield/tree/v0.7.1) - 2023-10-22
 
 ### Bug fixes
