@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from blocks.models import TextBlock
 from streamfield.field.models import StreamField
 
 
@@ -9,6 +10,12 @@ class Page(models.Model):
     header = models.CharField(
         _("header"),
         max_length=128
+    )
+    epigraph = models.ForeignKey(
+        TextBlock,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
     )
     slug = models.SlugField(
         _("slug"),

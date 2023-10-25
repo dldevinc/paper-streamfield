@@ -10,7 +10,7 @@ class PageAdmin(admin.ModelAdmin):
             "fields": ["header", "slug"]
         }),
         (None, {
-            "fields": ["stream"]
+            "fields": ["epigraph", "stream"]
         }),
     )
     ordering = ["id"]

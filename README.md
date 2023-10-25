@@ -240,6 +240,38 @@ customizing the context data and the rendering process of an individual block.
            processor = "your_app.processors.ReviewsBlockProcessor"
    ```
 
+### Using `render_block` template tag
+
+In some cases, you may have a page that references a specific block through 
+a `ForeignKey` relationship, and you want to render that referenced block on the page. 
+You can achieve this using the render_block template tag. Here's an example:
+
+```python
+# page/models.py
+
+from django.db import models
+from blocks.models import TextBlock
+
+class Page(models.Model):
+   text_block = models.ForeignKey(TextBlock, on_delete=models.SET_NULL, blank=True, null=True)
+
+   class Meta:
+      verbose_name = "Page"
+```
+
+```html
+<!-- app/templates/page.html -->
+{% load streamfield %}
+
+<div>
+    <h1>Page Title</h1>
+    <div>
+        <h2>Text Block:</h2>
+        {% render_block page.text_block %}
+    </div>
+</div>
+```
+
 ### Customize block in admin interface
 
 You can customize how a block is rendered in the admin interface
