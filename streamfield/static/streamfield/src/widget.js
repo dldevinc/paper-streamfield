@@ -373,67 +373,85 @@ XClass.register("paper-streamfield", {
  * @param {HTMLElement} triggeringLink
  */
 function showStreamBlockPopup(triggeringLink) {
-    return popupUtils.showAdminPopup(triggeringLink, /^(change|add|lookup)_/, true);
+    return popupUtils.showAdminPopup(triggeringLink, /^$/, true);
 }
 
 /**
- * @param {Window} win
- * @param {String} newId
+ * @param {Function} originalFunc
  */
-function dismissAddStreamBlockPopup(win, newId) {
-    const name = popupUtils.removePopupIndex(win.name);
-    const match = /^(.+)--(.+)\.(.+)$/.exec(name);
-    if (match) {
-        const control = document.getElementById(match[1]);
-        const field = control.closest(".stream-field");
-        const streamField = field && field._streamField;
+function dismissAddStreamBlockPopup(originalFunc) {
+    return function(win, newId, newRepr) {
+        const name = popupUtils.removePopupIndex(win.name);
+        const match = /^streamfield:add_(?<elementId>.+)--(?<blockModel>.+\..+)$/.exec(name);
+        if (match) {
+            const control = document.getElementById(match.groups.elementId);
+            if (!control) {
+                console.error(`Control not found: #${match.groups.elementId}`);
+                popupUtils.removeRelatedWindow(win);
+                win.close();
+            }
 
-        streamField._appendBlock({
-            model: `${match[2]}.${match[3]}`,
-            pk: newId,
-            uuid: uuid4(),
-            visible: true
-        });
+            const field = control.closest(".stream-field");
+            const streamField = field && field._streamField;
 
-        streamField.wrapPreloader(streamField.updateBlocks());
+            streamField._appendBlock({
+                model: match.groups.blockModel,
+                pk: newId,
+                uuid: uuid4(),
+                visible: true
+            });
 
-        popupUtils.removeRelatedWindow(win);
-        win.close();
+            streamField.wrapPreloader(streamField.updateBlocks());
+
+            popupUtils.removeRelatedWindow(win);
+            win.close();
+        } else {
+            originalFunc.apply(window, arguments);
+        }
     }
 }
 
 /**
- * @param {Window} win
+ * @param {Function} originalFunc
  */
-function dismissChangeStreamBlockPopup(win) {
-    const name = "change_" + popupUtils.removePopupIndex(win.name);
-    const element = document.getElementById(name);
-    const fieldWrapper = element && element.closest(".paper-widget");
-    const field = fieldWrapper && fieldWrapper.firstElementChild;
-    const instance = field && field._streamField;
+function dismissChangeStreamBlockPopup(originalFunc) {
+    return function(win, objId, newRepr, newId) {
+        const name = popupUtils.removePopupIndex(win.name);
+        const match = /^streamfield:change_block_(?<uuid>.+)$/.exec(name);
+        if (match) {
+            const block = document.querySelector(`.stream-field__block[data-uuid="${match.groups.uuid}"]`);
+            if (!block) {
+                console.error(`Block not found: ${match.groups.uuid}`);
+                popupUtils.removeRelatedWindow(win);
+                win.close();
+            }
 
-    instance.updateBlocks();
+            const fieldWrapper = block && block.closest(".paper-widget");
+            const field = fieldWrapper && fieldWrapper.firstElementChild;
+            const instance = field && field._streamField;
 
-    popupUtils.removeRelatedWindow(win);
-    win.close();
+            instance.updateBlocks();
+
+            popupUtils.removeRelatedWindow(win);
+            win.close();
+        } else {
+            originalFunc.apply(window, arguments);
+        }
+    }
 }
 
 /**
- * @param {Window} win
- * @param {String} objId
+ * @param {Function} originalFunc
  */
-function dismissDeleteStreamBlockPopup(win, objId) {
-    const name = popupUtils.removePopupIndex(win.name);
-    const match = /^(.+)--(.+)\.(.+)$/.exec(name);
-    if (match) {
-        const control = document.getElementById(match[1]);
-        const field = control.closest(".stream-field");
-        const streamField = field && field._streamField;
-
-        streamField.wrapPreloader(streamField.updateBlocks());
-
-        popupUtils.removeRelatedWindow(win);
-        win.close();
+function dismissDeleteStreamBlockPopup(originalFunc) {
+    return function(win, objId) {
+        const name = popupUtils.removePopupIndex(win.name);
+        const match = /^streamfield:lookup_(?<elementId>.+)--(?<blockModel>.+\..+)$/.exec(name);
+        if (match) {
+            win.history.go(-win.history.length + 1);
+        } else {
+            originalFunc.apply(window, arguments);
+        }
     }
 }
 
@@ -442,16 +460,22 @@ function dismissDeleteStreamBlockPopup(win, objId) {
  * @param {Function} originalFunc
  */
 function dismissLookupStreamBlockPopup(originalFunc) {
-    return (win, chosenId) => {
+    return function(win, chosenId) {
         const name = popupUtils.removePopupIndex(win.name);
-        const match = /^(.+)--(.+)\.(.+)$/.exec(name);
+        const match = /^streamfield:lookup_(?<elementId>.+)--(?<blockModel>.+\..+)$/.exec(name);
         if (match) {
-            const control = document.getElementById(match[1]);
+            const control = document.getElementById(match.groups.elementId);
+            if (!control) {
+                console.error(`Control not found: #${match.groups.elementId}`);
+                popupUtils.removeRelatedWindow(win);
+                win.close();
+            }
+
             const field = control.closest(".stream-field");
             const streamField = field && field._streamField;
 
             streamField._appendBlock({
-                model: `${match[2]}.${match[3]}`,
+                model: match.groups.blockModel,
                 pk: chosenId,
                 uuid: uuid4(),
                 visible: true
@@ -462,14 +486,13 @@ function dismissLookupStreamBlockPopup(originalFunc) {
             popupUtils.removeRelatedWindow(win);
             win.close();
         } else {
-            originalFunc(win, chosenId);
+            originalFunc.apply(window, arguments);
         }
-    };
+    }
 }
 
-window.dismissAddStreamBlockPopup = dismissAddStreamBlockPopup;
-window.dismissChangeStreamBlockPopup = dismissChangeStreamBlockPopup;
-window.dismissDeleteStreamBlockPopup = dismissDeleteStreamBlockPopup;
-
-// Wrap default `dismissRelatedLookupPopup`.
+// Wrap default callbacks.
 window.dismissRelatedLookupPopup = dismissLookupStreamBlockPopup(window.dismissRelatedLookupPopup);
+window.dismissAddRelatedObjectPopup = dismissAddStreamBlockPopup(window.dismissAddRelatedObjectPopup);
+window.dismissChangeRelatedObjectPopup = dismissChangeStreamBlockPopup(window.dismissChangeRelatedObjectPopup);
+window.dismissDeleteRelatedObjectPopup = dismissDeleteStreamBlockPopup(window.dismissDeleteRelatedObjectPopup);

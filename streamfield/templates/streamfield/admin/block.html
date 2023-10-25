@@ -30,7 +30,7 @@
         {% block tool-items %}
           {% if has_change_permission %}
             <a href="{% url opts|admin_urlname:"change" instance.pk|admin_urlquote %}"
-               id="change_uuid_{{ uuid }}"
+               id="streamfield:change_block_{{ uuid }}"
                class="stream-field__change-btn btn btn-square btn-sm btn-square--info bi-pencil-square"
                data-xclass="bs-tooltip"
                data-placement="top"
@@ -40,7 +40,7 @@
             </a>
           {% elif has_view_permission %}
             <a href="{% url opts|admin_urlname:"change" instance.pk|admin_urlquote %}"
-               id="change_uuid_{{ uuid }}"
+               id="streamfield:change_block_{{ uuid }}"
                class="stream-field__change-btn btn btn-square btn-sm btn-square--info bi-eye"
                data-xclass="bs-tooltip"
                data-placement="top"
