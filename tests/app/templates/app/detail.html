@@ -2,4 +2,8 @@
 
 <h1>{{ page.header }}</h1>
 
+{% if page.epigraph %}
+  <div style="font-style: italic">{% render_block page.epigraph %}</div>
+{% endif %}
+
 {% render_stream page.stream %}
