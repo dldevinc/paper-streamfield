@@ -3,7 +3,9 @@ from django.db import models
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ["HeaderBlock", "TextBlock", "ImageBlock", "QuoteBlock"]
+from .processors import AdvantagesBlockProcessor
+
+__all__ = ["HeaderBlock", "TextBlock", "ImageBlock", "QuoteBlock", "AdvantagesBlock"]
 
 
 class HeaderBlock(models.Model):
@@ -82,3 +84,19 @@ class QuoteBlock(models.Model):
         return Truncator(
             "{}: {}".format(self.author, self.text)
         ).chars(96)
+
+
+class AdvantagesBlock(models.Model):
+    header = models.TextField(
+        _("header")
+    )
+
+    class Meta:
+        verbose_name = "Advantages"
+
+    class StreamBlockMeta:
+        template_name = "blocks/advantages.html"
+        processor = AdvantagesBlockProcessor
+
+    def __str__(self):
+        return "Advantages Block"

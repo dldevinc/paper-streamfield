@@ -240,6 +240,29 @@ customizing the context data and the rendering process of an individual block.
            processor = "your_app.processors.ReviewsBlockProcessor"
    ```
 
+You can utilize the `exceptions.SkipBlock` feature to conditionally skip the rendering 
+of a block. This can be useful, for example, when dealing with a block like "Articles" 
+that should only render when there are articles available. Example:
+
+```python
+from streamfield.processors import DefaultProcessor
+from streamfield.exceptions import SkipBlock
+from articles.models import Article
+
+
+class ArticlesBlockProcessor(DefaultProcessor):
+    def get_context(self, block):
+        context = super().get_context(block)
+
+        articles = Article.object.all()[:3]
+        if len(articles) < 3:
+            # Skip block if not enough article instances
+            raise SkipBlock
+
+        context["articles"] = articles
+        return context
+```
+
 ### Using `render_block` template tag
 
 In some cases, you may have a page that references a specific block through 

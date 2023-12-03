@@ -7,7 +7,20 @@ from django.core.handlers.wsgi import WSGIRequest
 
 from . import blocks, exceptions
 from .logging import logger
-from .typing import TemplateContext
+from .processors import BaseProcessor
+from .typing import BlockInstance, TemplateContext
+
+
+def get_block_output(
+    processor: BaseProcessor,
+    block: BlockInstance,
+    context: TemplateContext,
+    request: WSGIRequest = None
+):
+    try:
+        return processor.render(block, context, request=request)
+    except exceptions.SkipBlock:
+        return ""
 
 
 def render_stream(
@@ -70,9 +83,9 @@ def render_stream(
             continue
 
         processor = model_processors[model]
-        output.append(
-            processor.render(block_instance, context, request=request)
-        )
+        block_output = get_block_output(processor, block_instance, context, request)
+        if block_output:
+            output.append(block_output)
 
     return "\n".join(output)
 
@@ -101,4 +114,4 @@ def render_block(
     except (KeyError, ObjectDoesNotExist, MultipleObjectsReturned):
         logger.warning("Invalid block: %r", record)
     else:
-        return processor.render(block, context, request)
+        return get_block_output(processor, block, context, request)

@@ -23,7 +23,7 @@ def do_render_stream(context, stream: str, **kwargs):
 def do_render_block(context, instance, **kwargs):
     ctx_dict = context.push(kwargs)
     processor = blocks.get_processor(type(instance))
-    output = processor.render(instance, ctx_dict.context.flatten())
+    output = helpers.get_block_output(processor, instance, ctx_dict.context.flatten())
     return mark_safe(output)
 
 
@@ -44,7 +44,7 @@ if jinja2 is not None:
         def render(self, instance, **kwargs):
             context_vars = dict(self.context.get_all(), **kwargs)
             processor = blocks.get_processor(type(instance))
-            return processor.render(instance, context_vars)
+            return helpers.get_block_output(processor, instance, context_vars)
 
 
     # django-jinja support
