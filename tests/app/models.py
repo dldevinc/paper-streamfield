@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from blocks.models import TextBlock
 from streamfield.field.models import StreamField
 
 
@@ -12,7 +11,7 @@ class Page(models.Model):
         max_length=128
     )
     epigraph = models.ForeignKey(
-        TextBlock,
+        "blocks.TextBlock",
         on_delete=models.SET_NULL,
         blank=True,
         null=True
@@ -40,3 +39,18 @@ class Page(models.Model):
         return reverse("app:detail", kwargs={
             "slug": self.slug
         })
+
+
+class Advantage(models.Model):
+    title = models.TextField(
+        _("title")
+    )
+    description = models.TextField(
+        _("description")
+    )
+
+    class Meta:
+        verbose_name = "advantage"
+
+    def __str__(self):
+        return self.title

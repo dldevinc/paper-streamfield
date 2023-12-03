@@ -1,4 +1,3 @@
-from typing import Dict
 from uuid import uuid4
 
 from django.apps import apps
@@ -10,7 +9,7 @@ from .processors import BaseProcessor
 from .typing import BlockInstance, BlockModel
 
 
-def to_dict(instance: BlockInstance) -> Dict[str, str]:
+def to_dict(instance: BlockInstance) -> dict[str, str]:
     """
     Сериализация блока для JSON.
 
@@ -28,7 +27,7 @@ def to_dict(instance: BlockInstance) -> Dict[str, str]:
     }
 
 
-def is_valid(value: Dict[str, str]) -> bool:
+def is_valid(value: dict[str, str]) -> bool:
     """
     Проверяет корректность словаря, представляющего блок.
     """
@@ -45,7 +44,7 @@ def is_valid(value: Dict[str, str]) -> bool:
     return True
 
 
-def get_model(value: Dict[str, str]) -> BlockModel:
+def get_model(value: dict[str, str]) -> BlockModel:
     """
     Возвращает класс модели блока из словаря,
     созданного с помощью функции `to_dict()`.

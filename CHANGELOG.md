@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.8.0](https://github.com/dldevinc/paper-streamfield/tree/v0.8.0) - 2023-12-03
+
+### ⚠ BREAKING CHANGES
+
+-   Dropped support for Python 3.8.
+-   Test against Python 3.12.
+
+### Features
+
+-   Added a `SkipBlock` exception for selectively interrupting the rendering 
+    of individual blocks.
+
 ## [0.7.2](https://github.com/dldevinc/paper-streamfield/tree/v0.7.2) - 2023-10-25
 
 ### Features
