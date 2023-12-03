@@ -5,11 +5,12 @@ from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.template.loader import render_to_string
 
 from .conf import DEFAULT_TEMPLATE_ENGINE
+from .typing import BlockInstance, TemplateContext
 from .utils import camel_case_to_snake_case
 
 
 class BaseProcessor:
-    def __init__(self, app_label, model_name, **kwargs):
+    def __init__(self, app_label: str, model_name: str, **kwargs):
         for key, value in kwargs.items():
             if not key.startswith("_") and key != "processor":
                 setattr(self, key, value)
@@ -39,8 +40,8 @@ class BaseProcessor:
         used during the rendering of a content block. It typically includes
         information related to the content block itself.
 
-        :type block: django.db.models.Model
-        :rtype: dict
+        :type block: BlockInstance
+        :rtype: TemplateContext
         """
         raise NotImplementedError
 
@@ -49,7 +50,7 @@ class BaseProcessor:
         Get a list of template names to be used for rendering
         the content block.
 
-        :type block: django.db.models.Model
+        :type block: BlockInstance
         :rtype: str|list[str]|tuple[str]
         """
         raise NotImplementedError
@@ -59,8 +60,8 @@ class BaseProcessor:
         This method takes a content block model instance,
         processes it, and renders it as HTML.
 
-        :type block: django.db.models.Model
-        :type context: dict|None
+        :type block: BlockInstance
+        :type context: TemplateContext|None
         :type request: django.core.handlers.wsgi.WSGIRequest
         :rtype: str
         """
@@ -136,7 +137,7 @@ class DefaultProcessor(BaseProcessor):
         The cache key is used to store and retrieve content blocks from cache,
         allowing for efficient caching of rendered content.
 
-        :type block: django.db.models.Model
+        :type block: BlockInstance
         :rtype: str
         """
         return "{}.{}:{}".format(
@@ -154,7 +155,7 @@ class DefaultProcessor(BaseProcessor):
         the rendered content block will be cached before it expires
         and is refreshed.
 
-        :type block: django.db.models.Model
+        :type block: BlockInstance
         :rtype: int
         """
         return self.cache_ttl

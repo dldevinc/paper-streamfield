@@ -1,6 +1,6 @@
 import json
 from json import JSONDecodeError
-from typing import Any, Dict, List
+from typing import Any
 
 from django.apps import apps
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -67,7 +67,7 @@ class RenderStreamView(AdminStreamViewMixin, View):
             )
         })
 
-    def render_block(self, record: Dict[str, Any], allowed_models: List["str"]) -> str:
+    def render_block(self, record: dict[str, Any], allowed_models: list[str]) -> str:
         if not blocks.is_valid(record):
             return self.block_invalid(record, _("Invalid data format"))
 
@@ -92,7 +92,7 @@ class RenderStreamView(AdminStreamViewMixin, View):
         else:
             return self.block_valid(record, block)
 
-    def block_valid(self, record: Dict[str, Any], block: BlockInstance) -> str:
+    def block_valid(self, record: dict[str, Any], block: BlockInstance) -> str:
         model_admin = self.get_model_admin(type(block))
         template = getattr(model_admin, "stream_block_template")
         return render_to_string(template, {
@@ -104,7 +104,7 @@ class RenderStreamView(AdminStreamViewMixin, View):
             "has_view_permission": model_admin.has_view_permission(self.request, block) if model_admin is not None else False,
         }, request=self.request)
 
-    def block_invalid(self, record: Dict[str, Any], reason: str) -> str:
+    def block_invalid(self, record: dict[str, Any], reason: str) -> str:
         return render_to_string("streamfield/admin/invalid_block.html", {
             "uuid": record.get("uuid", ""),
             "model": record.get("model", "undefined"),

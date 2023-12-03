@@ -1,15 +1,20 @@
 import json
 from collections import defaultdict
-from typing import Dict, List, Union
+from typing import Union
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 
 from . import blocks, exceptions
 from .logging import logger
+from .typing import TemplateContext
 
 
-def render_stream(stream: Union[str, List], context: Dict = None, request: WSGIRequest = None) -> str:
+def render_stream(
+    stream: Union[str, list],
+    context: TemplateContext = None,
+    request: WSGIRequest = None
+) -> str:
     """
     Render all content blocks contained in the provided JSON array.
 
@@ -72,7 +77,11 @@ def render_stream(stream: Union[str, List], context: Dict = None, request: WSGIR
     return "\n".join(output)
 
 
-def render_block(record: Dict, context: Dict = None, request: WSGIRequest = None):
+def render_block(
+    record: dict,
+    context: TemplateContext = None,
+    request: WSGIRequest = None
+):
     """
     Helper method not used by the library because rendering
     each block separately leads to unnecessary SQL queries.

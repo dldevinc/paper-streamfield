@@ -1,7 +1,7 @@
-from typing import Any, Callable, Dict, Type
+from typing import Any
 
 from django.db import models
 
-BlockModel = Type[models.Model]
+BlockModel = type[models.Model]
 BlockInstance = models.Model
-RenderFuncCallable = Callable[[BlockInstance, Dict[str, Any]], str]
+TemplateContext = dict[str, Any]
