@@ -8,7 +8,7 @@ Implementation of the Wagtail's StreamField block picker for paper-admin.
 
 ## Compatibility
 
--   `python` >= 3.8
+-   `python` >= 3.9
 -   `django` >= 3.1
 -   `paper-admin` >= 6.0
 
